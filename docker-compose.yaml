@@ -1,7 +1,8 @@
 version: '3.9'
 services:
+
   postgres:
-    container_name: keycloak_db
+    container_name: database
     image: postgres:latest
     restart: unless-stopped
     environment:
@@ -11,17 +12,17 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - rede_docker
+      - rede_digitalmoney
     volumes:
       - db:/var/lib/postgresql/data
 
   keycloak:
     depends_on:
       - postgres
-    container_name: keycloak_server
+    container_name: keycloak
     image: quay.io/keycloak/keycloak:20.0.2-1
     ports:
-      - '8090:8080'
+      - '8070:8080'
     command: "start-dev"
     environment:
       KEYCLOAK_ADMIN: admin
@@ -31,10 +32,27 @@ services:
       KC_DB_USERNAME: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
     networks:
-      - rede_docker
+      - rede_digitalmoney
+
+  db_service:
+    container_name: db_users
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: 'users-service'
+      MYSQL_USER: 'users-service'
+      MYSQL_PASSWORD: 'users-service'
+      MYSQL_ROOT_PASSWORD: 'strongest-password'
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-mysql:/var/lib/mysql
+    networks:
+      - rede_digitalmoney
 
 networks:
-  rede_docker:
+  rede_digitalmoney:
     driver: bridge
 volumes:
   db:
+  db-mysql:
