@@ -1,0 +1,55 @@
+digitalmoney:
+  keycloak:
+    realm: digitalmoney
+    serverUrl: http://localhost:8070/
+    clientId: backend
+    clientSecret: f2FR95qINBfw2mPbh43ER35aKHPDyweF
+
+spring:
+  application:
+    name: users-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/users-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: users-service
+    password: users-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    generate-ddl: true
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak-registration:
+            provider: keycloak-provider
+            client-id: backend
+            authorization-grant-type: client_credentials
+            client-secret: f2FR95qINBfw2mPbh43ER35aKHPDyweF
+        provider:
+          keycloak-provider:
+            token-uri: http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8070/realms/digitalmoney
+
+server:
+  port: 8081
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 0.0.1
+    decription: Users service
+  svc:
+    port: ${server.port}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
