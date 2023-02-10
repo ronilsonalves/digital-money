@@ -4,12 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.*;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serial;
@@ -18,8 +14,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@RequiredArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 public class User implements Serializable {
@@ -32,13 +28,15 @@ public class User implements Serializable {
     @GenericGenerator(name = "system-uuid",strategy = "uuid2")
     private UUID Id;
 
-    @NotEmpty
+    @NotBlank
     private String name;
 
-    @NotEmpty
+    @NotBlank
     private String lastName;
 
-    @NotEmpty
+    @NotBlank
+    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}$/")
+    @Size(min = 11, max = 14)
     private String cpf;
 
     @Email
@@ -46,4 +44,8 @@ public class User implements Serializable {
 
     @NotEmpty
     private String phone;
+
+    public User(String id) {
+        this.Id = UUID.fromString(id);
+    }
 }
