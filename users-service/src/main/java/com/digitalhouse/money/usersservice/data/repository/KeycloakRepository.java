@@ -9,7 +9,6 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import javax.ws.rs.BadRequestException;
@@ -37,8 +36,6 @@ public class KeycloakRepository implements IUserKeycloakRepository {
                     .users().get(String.valueOf(uuid));
 
             UserRepresentation userRepresentation = userResource.toRepresentation();
-            //exibir no console o que esta vindo do keycloak
-            log.info(fromRepresentation(userRepresentation).getId().toString());
             return fromRepresentation(userRepresentation);
         } catch (NotFoundException e) {
             log.info(e.getMessage());
@@ -56,7 +53,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             String userId = CreatedResponseUtil.getCreatedId(userResponse);
             passwordCred.setTemporary(false);
             passwordCred.setType("password");
-            passwordCred.setValue(new BCryptPasswordEncoder().encode(user.getPassword()));
+            passwordCred.setValue(user.getPassword());
             UserResource userResource = keycloak.realm(realm).users().get(userId);
             userResource.resetPassword(passwordCred);
             User response = new User();
@@ -70,7 +67,8 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     }
 
     private User fromRepresentation(UserRepresentation userRepresentation) {
-        return new User(userRepresentation.getId());
+        return new User(userRepresentation.getId(), userRepresentation.getFirstName(),
+                userRepresentation.getLastName(), userRepresentation.getEmail());
     }
 
     private UserRepresentation fromUser(UserRequestBody user) {
@@ -79,6 +77,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         userRepresentation.setFirstName(user.getName());
         userRepresentation.setLastName(user.getLastName());
         userRepresentation.setEmail(user.getEmail());
+        userRepresentation.setEnabled(false);
         return userRepresentation;
     }
 }
