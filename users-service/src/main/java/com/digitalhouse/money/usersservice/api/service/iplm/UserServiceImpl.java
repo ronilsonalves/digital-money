@@ -5,8 +5,8 @@ import com.digitalhouse.money.usersservice.api.service.UserService;
 import com.digitalhouse.money.usersservice.data.model.User;
 import com.digitalhouse.money.usersservice.data.repository.IUserKeycloakRepository;
 import com.digitalhouse.money.usersservice.data.repository.UserRepository;
+import com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +30,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User save(UserRequestBody userRequestBody) {
-        logger.info(userRequestBody.toString());
-        User fromKeyCloak = iUserKeycloak.save(userRequestBody);
-        logger.info(fromKeyCloak.toString());
-        BeanUtils.copyProperties(userRequestBody,fromKeyCloak);
-        return userRepository.save(fromKeyCloak);
+        try {
+            logger.info(userRequestBody.toString());
+            User fromKeyCloak = iUserKeycloak.save(userRequestBody);
+            BeanUtils.copyProperties(userRequestBody,fromKeyCloak);
+            logger.info(fromKeyCloak.toString());
+            return userRepository.save(fromKeyCloak);
+        } catch (Exception e) {
+            logger.info(e.toString());
+            throw new BadRequestException(e.getMessage());
+        }
+
     }
 
     @Override

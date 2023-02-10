@@ -19,10 +19,10 @@ public class KeycloakClientConfig {
     @Value("${digitalmoney.keycloak.serverUrl}")
     private String serverUrl;
 
-    @Value("${digitalmoney.keycloak.clientid}")
+    @Value("${digitalmoney.keycloak.clientId}")
     private String clientId;
 
-    @Value("${digitalmoney.keycloak.clientsecret}")
+    @Value("${digitalmoney.keycloak.clientSecret}")
     private String clientSecret;
 
     @Bean

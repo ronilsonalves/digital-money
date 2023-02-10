@@ -19,7 +19,7 @@ public class UserRequestBody {
     private String lastName;
 
     @NotBlank
-    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}$/")
+    @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}$")
     @Size(min = 11, max = 14)
     private String cpf;
 
@@ -27,6 +27,8 @@ public class UserRequestBody {
     private String email;
 
     @NotEmpty
+    @Pattern(regexp = "^(\\(?[0-9]{2}\\)?)??([0-9]{4,5})-?([0-9]{4})$")
+    @Size(min = 10, max = 15)
     private String phone;
 
     @NotBlank
