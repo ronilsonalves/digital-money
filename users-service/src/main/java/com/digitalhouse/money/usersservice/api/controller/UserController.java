@@ -39,6 +39,9 @@ public class UserController {
      * Create a request to reset password sent to user's email
      * @param userResetPasswordRequest provided in request body
      * @return HttpStatus.OK if there's a user registered with the email address provided
+     * @throws BadRequestException if an invalid email address is provided
+     * @throws ResourceNotFoundException if a valid email address is provided but there's no user with this email
+     * registered
      */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody UserResetPasswordRequest userResetPasswordRequest) {
