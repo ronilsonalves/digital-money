@@ -6,10 +6,12 @@ import com.digitalhouse.money.usersservice.data.model.User;
 import com.digitalhouse.money.usersservice.data.repository.IUserKeycloakRepository;
 import com.digitalhouse.money.usersservice.data.repository.UserRepository;
 import com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException;
+import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
 import jakarta.inject.Inject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -31,20 +33,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public User save(UserRequestBody userRequestBody) {
         try {
-            logger.info(userRequestBody.toString());
             User fromKeyCloak = iUserKeycloak.save(userRequestBody);
             BeanUtils.copyProperties(userRequestBody,fromKeyCloak);
-            logger.info(fromKeyCloak.toString());
             return userRepository.save(fromKeyCloak);
         } catch (Exception e) {
             logger.info(e.toString());
             throw new BadRequestException(e.getMessage());
         }
+    }
 
+    public void resetPassword(String userEmailAddress) {
+        Optional<User> fromDb = userRepository.findUserByEmail(userEmailAddress);
+        if (fromDb.isPresent()) {
+            try {
+                iUserKeycloak.resetPassword(fromDb.get().getId());
+            } catch (BadRequestException e) {
+                throw new BadRequestException(e.getMessage());
+            }
+        }
+        if (fromDb.isEmpty()) {
+            throw new ResourceNotFoundException("There's no user registered with the email address provided");
+        }
     }
 
     @Override
-    public User getUserByUUID(UUID uuid) {
+    public User getUserByUUID(UUID uuid) throws ResourceNotFoundException {
         return iUserKeycloak.findUserByUUID(uuid);
     }
 }

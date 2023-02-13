@@ -22,4 +22,14 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
     }
+
+    @ResponseBody
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<MessageExceptionHandler> notFoundException(ResourceNotFoundException notFoundException) {
+        MessageExceptionHandler error = new MessageExceptionHandler(
+                LocalDateTime.now(),HttpStatus.NOT_FOUND.value(),notFoundException.getMessage()
+        );
+        return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
+    }
 }

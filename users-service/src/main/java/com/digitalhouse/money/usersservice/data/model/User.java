@@ -2,12 +2,12 @@ package com.digitalhouse.money.usersservice.data.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -27,8 +27,7 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1912491329356572322L;
 
     @jakarta.persistence.Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid",strategy = "uuid2")
+    @Column(nullable = false,unique = true)
     private UUID Id;
 
     @NotBlank

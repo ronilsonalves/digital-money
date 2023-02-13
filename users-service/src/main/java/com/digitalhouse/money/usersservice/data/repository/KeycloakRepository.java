@@ -2,6 +2,7 @@ package com.digitalhouse.money.usersservice.data.repository;
 
 import com.digitalhouse.money.usersservice.api.request.UserRequestBody;
 import com.digitalhouse.money.usersservice.data.model.User;
+import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -29,7 +31,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     private String realm;
 
     @Override
-    public User findUserByUUID(UUID uuid) {
+    public User findUserByUUID(UUID uuid) throws NotFoundException{
         try {
             UserResource userResource = keycloak
                     .realm(realm)
@@ -38,8 +40,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             UserRepresentation userRepresentation = userResource.toRepresentation();
             return fromRepresentation(userRepresentation);
         } catch (NotFoundException e) {
-            log.info(e.getMessage());
-            return null;
+            throw new ResourceNotFoundException("There's no user with data provided registered");
         }
     }
 
@@ -62,7 +63,31 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             return response;
         } catch (BadRequestException e) {
             log.info(e.getMessage());
-            return null;
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException(
+                    "Please, verify the provided data for fields on RequestBody and try again.");
+        }
+    }
+
+    /**
+     * Send an email message through Keycloak to user reset your password.
+     * @param userID provided by query into users-service's database.
+     * @throws ResourceNotFoundException if there's no user registered in Keycloak with provided UUID
+     * @throws com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException if an invalid email address
+     * or any other param(s) provided is invalid, this can be interfered by Realm configs and if a user is
+     * disabled.
+     */
+    @Override
+    public void resetPassword(UUID userID) {
+        try {
+            keycloak.realm(realm).users().get(String.valueOf(userID)).executeActionsEmail(Collections.singletonList(
+                    "UPDATE_PASSWORD"));
+        } catch (NotFoundException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException("There's no user " +
+                    "registered with provided email address.");
+        }
+        catch (BadRequestException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException("An error occurred " +
+                    "while trying to perform your request, try again later and if error persists contact support. ");
         }
     }
 
@@ -77,7 +102,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         userRepresentation.setFirstName(user.getName());
         userRepresentation.setLastName(user.getLastName());
         userRepresentation.setEmail(user.getEmail());
-        userRepresentation.setEnabled(false);
+        userRepresentation.setEnabled(true);
         return userRepresentation;
     }
 }
