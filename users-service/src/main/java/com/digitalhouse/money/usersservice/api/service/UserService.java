@@ -10,5 +10,7 @@ public interface UserService {
 
     User save(UserRequestBody userRequestBody);
 
+    void resetPassword(String userEmailAddress);
+
     User getUserByUUID(UUID uuid);
 }

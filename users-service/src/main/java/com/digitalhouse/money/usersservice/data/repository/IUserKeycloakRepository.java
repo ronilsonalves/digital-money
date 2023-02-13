@@ -8,6 +8,8 @@ import java.util.UUID;
 public interface IUserKeycloakRepository {
     User findUserByUUID(UUID uuid);
 
+    void resetPassword(UUID userID);
+
     User save(UserRequestBody user);
 
 }

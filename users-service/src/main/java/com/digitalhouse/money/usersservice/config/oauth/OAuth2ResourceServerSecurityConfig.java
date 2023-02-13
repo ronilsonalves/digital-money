@@ -9,8 +9,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.web.SecurityFilterChain;
 
-import javax.ws.rs.HttpMethod;
-
 @Configuration
 @EnableMethodSecurity
 public class OAuth2ResourceServerSecurityConfig {
@@ -29,6 +27,7 @@ public class OAuth2ResourceServerSecurityConfig {
                                         "/v3/api-docs/**",
                                         "/actuator/**",
                                         "/users/register",
+                                        "/users/**",
                                         "/users/reset-password/**",
                                         "/users/send-verification/**",
                                         "/users/verify-email/**").permitAll()
