@@ -1,7 +1,10 @@
 package com.digitalhouse.money.usersservice.data.repository;
 
+import com.digitalhouse.money.usersservice.api.request.UserLoginRequestBody;
 import com.digitalhouse.money.usersservice.api.request.UserRequestBody;
+import com.digitalhouse.money.usersservice.api.response.TokenResponse;
 import com.digitalhouse.money.usersservice.data.model.User;
+import com.digitalhouse.money.usersservice.exceptionhandler.InvalidCredentialsException;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
@@ -29,6 +33,12 @@ public class KeycloakRepository implements IUserKeycloakRepository {
 
     @Value("${digitalmoney.keycloak.realm}")
     private String realm;
+
+    @Value("${digitalmoney.keycloak.clientIdUsers}")
+    private String clientId;
+
+    @Value("${digitalmoney.keycloak.clientSecretUsers}")
+    private String clientSecret;
 
     @Override
     public User findUserByUUID(UUID uuid) throws NotFoundException{
@@ -88,6 +98,21 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         catch (BadRequestException e) {
             throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException("An error occurred " +
                     "while trying to perform your request, try again later and if error persists contact support. ");
+        }
+    }
+
+    public Object login(UserLoginRequestBody userLoginRequestBody) {
+        try {
+            Keycloak keycloak1 = Keycloak.getInstance("http://localhost:8070/",realm,
+                    userLoginRequestBody.getEmail(), userLoginRequestBody.getPassword(),clientId,
+                    clientSecret);
+
+            return new TokenResponse("Bearer "+keycloak1.tokenManager().getAccessToken().getToken());
+        } catch (BadRequestException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException("An error occurred " +
+                    "while trying to authenticate user.");
+        } catch (NotAuthorizedException e) {
+            throw new InvalidCredentialsException("User and/or pass are invalid! Please check the credentials and try again.");
         }
     }
 

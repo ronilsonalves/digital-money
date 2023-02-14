@@ -26,6 +26,7 @@ public class OAuth2ResourceServerSecurityConfig {
                                         "/webjars/**",
                                         "/v3/api-docs/**",
                                         "/actuator/**",
+                                        "/auth/login",
                                         "/users/register",
                                         "/users/**",
                                         "/users/reset-password/**",
