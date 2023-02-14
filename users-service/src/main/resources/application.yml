@@ -4,6 +4,8 @@ digitalmoney:
     serverUrl: http://localhost:8070/
     clientId: backend
     clientSecret: f2FR95qINBfw2mPbh43ER35aKHPDyweF
+    clientIdUsers: users-service
+    clientSecretUsers: K8yyhrk3R8g271PtiGXTVtAVyjXQSNx5
 
 spring:
   application:
