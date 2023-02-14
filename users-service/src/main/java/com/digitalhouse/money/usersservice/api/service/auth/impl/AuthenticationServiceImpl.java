@@ -6,6 +6,8 @@ import com.digitalhouse.money.usersservice.api.service.auth.AuthenticationServic
 import com.digitalhouse.money.usersservice.data.repository.KeycloakRepository;
 import com.digitalhouse.money.usersservice.data.repository.UserRepository;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -25,5 +27,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return tokenResponse;
         }
         throw new ResourceNotFoundException("There's no user with email address informed");
+    }
+
+    @Override
+    public void logout(String id, String token) {
+        keycloakRepository.logout(id, token);
     }
 }

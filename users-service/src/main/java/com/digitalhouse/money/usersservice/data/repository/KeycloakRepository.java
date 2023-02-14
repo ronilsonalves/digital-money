@@ -12,7 +12,12 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.stereotype.Repository;
 
 import javax.ws.rs.BadRequestException;
@@ -30,6 +35,9 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     private static Logger log = Logger.getLogger(KeycloakRepository.class.getName());
 
     private final Keycloak keycloak;
+
+    @Autowired
+    private ApplicationContext context;
 
     @Value("${digitalmoney.keycloak.realm}")
     private String realm;
@@ -75,6 +83,28 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             log.info(e.getMessage());
             throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException(
                     "Please, verify the provided data for fields on RequestBody and try again.");
+        }
+    }
+
+    @Override
+    public void logout(String id, String token) {
+        try {
+            JwtDecoder jwtDecoder1 = context.getBean(JwtDecoder.class);
+            Jwt decodedToken = jwtDecoder1.decode(token.substring(7, token.length()));
+            String userId = decodedToken.getClaims().get("sub").toString();
+
+            Keycloak keycloak1 = Keycloak.getInstance(
+                    "http://localhost:8070/",
+                    realm,
+                    clientId,
+                    token.substring(7, token.length())
+            );
+
+            if (id == userId) {
+                keycloak1.tokenManager().logout();
+            }
+        } catch (Exception e) {
+            log.info(e.getMessage());
         }
     }
 
