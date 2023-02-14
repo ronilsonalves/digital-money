@@ -32,4 +32,14 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(error,HttpStatus.NOT_FOUND);
     }
+
+    @ResponseBody
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<MessageExceptionHandler> invalidCredentialsException(InvalidCredentialsException invalidCredentialsException) {
+        MessageExceptionHandler error = new MessageExceptionHandler(
+                LocalDateTime.now(),HttpStatus.UNAUTHORIZED.value(), invalidCredentialsException.getMessage()
+        );
+        return new ResponseEntity<>(error,HttpStatus.UNAUTHORIZED);
+    }
 }
