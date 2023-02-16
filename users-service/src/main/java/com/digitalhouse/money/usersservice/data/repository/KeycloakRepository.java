@@ -2,7 +2,9 @@ package com.digitalhouse.money.usersservice.data.repository;
 
 import com.digitalhouse.money.usersservice.api.request.UserLoginRequestBody;
 import com.digitalhouse.money.usersservice.api.request.UserRequestBody;
+import com.digitalhouse.money.usersservice.api.response.KeycloakUserInfoResponse;
 import com.digitalhouse.money.usersservice.api.response.TokenResponse;
+import com.digitalhouse.money.usersservice.api.service.auth.TokenInvalidationService;
 import com.digitalhouse.money.usersservice.data.model.User;
 import com.digitalhouse.money.usersservice.exceptionhandler.InvalidCredentialsException;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
@@ -13,7 +15,12 @@ import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotAuthorizedException;
@@ -31,6 +38,8 @@ public class KeycloakRepository implements IUserKeycloakRepository {
 
     private final Keycloak keycloak;
 
+    private final TokenInvalidationService tokenInvalidationService;
+
     @Value("${digitalmoney.keycloak.realm}")
     private String realm;
 
@@ -39,6 +48,9 @@ public class KeycloakRepository implements IUserKeycloakRepository {
 
     @Value("${digitalmoney.keycloak.clientSecretUsers}")
     private String clientSecret;
+
+    @Value("${digitalmoney.keycloak.usersInfoEndpoint}")
+    private String usersInfoEndpoint;
 
     @Override
     public User findUserByUUID(UUID uuid) throws NotFoundException{
@@ -79,6 +91,27 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     }
 
     /**
+     * Perform a logout thought Keycloak instance using RestAdmin Client and invalidates the provided token
+     * performing a POST request to keycloak revoke endpoint
+     * @param token received from request
+     * @throws ResourceNotFoundException if even with a valid token the user mapped in not exists in keycloak realm
+     */
+    @Override
+    public void logout(String token) {
+        String bearerToken = token.substring(7);
+        KeycloakUserInfoResponse keycloakUserInfo = getUserInfo(token);
+        try {
+            String userId = keycloakUserInfo.getSub();
+            tokenInvalidationService.invalidateToken(bearerToken);
+            keycloak.realm(realm).users().get(userId).logout();
+
+        } catch (NotFoundException e){
+            throw new ResourceNotFoundException("Unable to invalidate token. There's no user registered that match " +
+                    "with provided token");
+        }
+    }
+
+    /**
      * Send an email message through Keycloak to user reset your password.
      * @param userID provided by query into users-service's database.
      * @throws ResourceNotFoundException if there's no user registered in Keycloak with provided UUID
@@ -105,7 +138,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         try {
             Keycloak keycloak1 = Keycloak.getInstance("http://localhost:8070/",realm,
                     userLoginRequestBody.getEmail(), userLoginRequestBody.getPassword(),clientId,
-                    clientSecret);
+                    clientSecret,null,null,false,null,"openid");
 
             return new TokenResponse("Bearer "+keycloak1.tokenManager().getAccessToken().getToken());
         } catch (BadRequestException e) {
@@ -129,5 +162,31 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         userRepresentation.setEmail(user.getEmail());
         userRepresentation.setEnabled(true);
         return userRepresentation;
+    }
+
+    /**
+     * Get user's information using a valid token
+     * @param token provided to validate user's info
+     * @return KeycloakUserInfoResponse object containing the userId, if email is verified, name and email address
+     * @throws InvalidCredentialsException if token already invalidated or expired and if the user mapped with this
+     * token does not have access to user's info endpoint.
+     */
+    private KeycloakUserInfoResponse getUserInfo(String token) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            MultiValueMap<String,String> headers = new LinkedMultiValueMap<>();
+            headers.add("Authorization",token);
+            HttpEntity<MultiValueMap<String,String>> request = new HttpEntity<>(null,headers);
+            return restTemplate.postForObject(usersInfoEndpoint,request,
+                    KeycloakUserInfoResponse.class);
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.warning("Token already invalid");
+            throw new InvalidCredentialsException("Session already finished. The provided token already invalidated " +
+                    "or expired");
+        } catch (HttpClientErrorException.Forbidden e) {
+            log.warning("User's token has not authorization to fetch the user's info endpoint");
+            throw new InvalidCredentialsException("The user's token provided does not have permission to perform this" +
+                    " request. Verify the Token and try again.");
+        }
     }
 }
