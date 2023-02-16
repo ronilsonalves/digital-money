@@ -7,5 +7,5 @@ public interface AuthenticationService {
 
     TokenResponse login(UserLoginRequestBody userLoginRequestBody);
 
-    void logout(String id, String token);
+    void logout(String token);
 }

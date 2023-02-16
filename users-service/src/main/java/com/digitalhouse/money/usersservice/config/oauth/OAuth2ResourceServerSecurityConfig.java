@@ -27,6 +27,7 @@ public class OAuth2ResourceServerSecurityConfig {
                                         "/v3/api-docs/**",
                                         "/actuator/**",
                                         "/auth/login",
+                                        "/auth/logout",
                                         "/users/register",
                                         "/users/**",
                                         "/users/reset-password/**",

@@ -3,9 +3,10 @@ digitalmoney:
     realm: digitalmoney
     serverUrl: http://localhost:8070/
     clientId: backend
-    clientSecret: f2FR95qINBfw2mPbh43ER35aKHPDyweF
+    clientSecret: cKiJPsLJvkKdOEfSpvbpMmkHKcfwGthY
     clientIdUsers: users-service
-    clientSecretUsers: K8yyhrk3R8g271PtiGXTVtAVyjXQSNx5
+    clientSecretUsers: KOqlRonu7wFZKi08JxREu3rHMacuDOFE
+    usersInfoEndpoint: "${digitalmoney.keycloak.serverUrl}/realms/${digitalmoney.keycloak.realm}/protocol/openid-connect/userinfo"
 
 spring:
   application:
@@ -30,7 +31,7 @@ spring:
             provider: keycloak-provider
             client-id: backend
             authorization-grant-type: client_credentials
-            client-secret: f2FR95qINBfw2mPbh43ER35aKHPDyweF
+            client-secret: cKiJPsLJvkKdOEfSpvbpMmkHKcfwGthY
         provider:
           keycloak-provider:
             token-uri: http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token

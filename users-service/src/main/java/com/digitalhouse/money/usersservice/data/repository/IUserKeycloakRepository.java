@@ -12,5 +12,5 @@ public interface IUserKeycloakRepository {
 
     User save(UserRequestBody user);
 
-    void logout(String id, String token);
+    void logout(String token);
 }

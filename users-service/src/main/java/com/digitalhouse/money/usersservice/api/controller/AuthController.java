@@ -5,10 +5,18 @@ import com.digitalhouse.money.usersservice.api.response.TokenResponse;
 import com.digitalhouse.money.usersservice.api.service.auth.AuthenticationService;
 import com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.usersservice.exceptionhandler.InvalidCredentialsException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.models.headers.Header;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.apache.http.protocol.HTTP;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +34,11 @@ public class AuthController {
         return ResponseEntity.ok().body(authenticationService.login(userLoginRequestBody));
     }
 
-    @PostMapping("/logout/{id}")
-    public ResponseEntity<Void> logout(@PathVariable @NotBlank String id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token)
-            throws BadRequestException, InvalidCredentialsException {
-        authenticationService.logout(id, token);
+    @SecurityRequirement(name = "BearerAuth")
+    @PostMapping(value = "/logout")
+    public ResponseEntity<Void> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) throws BadRequestException,
+                                       InvalidCredentialsException {
+        authenticationService.logout(token);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
