@@ -1,9 +1,56 @@
-
 spring:
+  application:
+    name: account-service
+
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: password
-    driverClassName: org.h2.Driver
+    url: jdbc:mysql://localhost:3307/account-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: account-service
+    password: account-service
   jpa:
-    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    generate-ddl: true
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak-registration:
+            provider: keycloak-provider
+            client-id: backend
+            authorization-grant-type: client_credentials
+            client-secret: ewdSTNwzOd3ApyY1Gqk0zxqBREGfOvZl
+        provider:
+          keycloak-provider:
+            token-uri: http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8070/realms/digitalmoney
+
+server:
+  port: 8082
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 0.0.1
+    decription: Users service
+  svc:
+    port: ${server.port}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+digitalmoney:
+  keycloak:
+    realm: digitalmoney
+    serverUrl: http://localhost:8070/
+    clientId: backend
+    clientSecret: ewdSTNwzOd3ApyY1Gqk0zxqBREGfOvZl
+    usersInfoEndpoint: "${digitalmoney.keycloak.serverUrl}/realms/${digitalmoney.keycloak.realm}/protocol/openid-connect/userinfo"

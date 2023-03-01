@@ -1,4 +1,4 @@
-package com.digitalhouse.money.usersservice.config.oauth;
+package com.digitalhouse.money.accountservice.config.oauth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
