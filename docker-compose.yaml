@@ -22,7 +22,7 @@ services:
     container_name: keycloak
     image: quay.io/keycloak/keycloak:20.0.2-1
     volumes:
-      - ./keycloak/imports:/opt/keycloak/data/import
+      - ./keycloak/import:/opt/keycloak/data/import
     ports:
       - '8070:8080'
     command: "start-dev --import-realm"

@@ -25,7 +25,14 @@ public class OAuth2ResourceServerSecurityConfig {
                                         "/swagger/**",
                                         "/webjars/**",
                                         "/v3/api-docs/**",
-                                        "/actuator/**")
+                                        "/actuator/**",
+                                        "/auth/login",
+                                        "/auth/logout",
+                                        "/users/register",
+                                        "/users/**",
+                                        "/users/reset-password/**",
+                                        "/users/send-verification/**",
+                                        "/users/verify-email/**")
                                 .permitAll()
                                 .and()
                                 .sessionManagement()

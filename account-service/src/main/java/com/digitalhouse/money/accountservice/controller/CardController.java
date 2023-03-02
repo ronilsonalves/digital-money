@@ -3,6 +3,7 @@ package com.digitalhouse.money.accountservice.controller;
 import com.digitalhouse.money.accountservice.data.dto.CardRequestDTO;
 import com.digitalhouse.money.accountservice.data.model.Card;
 import com.digitalhouse.money.accountservice.service.CardService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/")
+@Tag(name = "Cards")
 public class CardController {
 
     @Autowired
