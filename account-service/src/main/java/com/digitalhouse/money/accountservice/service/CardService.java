@@ -3,6 +3,7 @@ package com.digitalhouse.money.accountservice.service;
 import com.digitalhouse.money.accountservice.data.dto.CardRequestDTO;
 import com.digitalhouse.money.accountservice.data.model.Card;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ public interface CardService {
 
     Optional<Card> getById(UUID id);
 
-    Optional<Card[]> getByUserId(UUID userId);
+    List<Card> getCardsByAccountId(UUID accountId);
 
     void delete(Card card);
 }

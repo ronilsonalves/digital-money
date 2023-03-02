@@ -43,4 +43,13 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ResponseBody
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<MessageExceptionHandler> unauthorizedException(UnauthorizedException unauthorizedException) {
+        MessageExceptionHandler error = new MessageExceptionHandler(
+                LocalDateTime.now(), HttpStatus.UNAUTHORIZED.value(), unauthorizedException.getMessage()
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
 }

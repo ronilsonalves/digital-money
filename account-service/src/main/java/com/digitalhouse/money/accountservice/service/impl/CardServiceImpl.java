@@ -1,22 +1,26 @@
 package com.digitalhouse.money.accountservice.service.impl;
 
 import com.digitalhouse.money.accountservice.data.dto.CardRequestDTO;
+import com.digitalhouse.money.accountservice.data.model.Account;
 import com.digitalhouse.money.accountservice.data.model.Card;
 import com.digitalhouse.money.accountservice.data.repository.AccountRepository;
 import com.digitalhouse.money.accountservice.data.repository.CardRepository;
 import com.digitalhouse.money.accountservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ConflictException;
+import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
+import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import javax.ws.rs.NotAuthorizedException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -25,6 +29,9 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    CardRepository cardRepository;
 
     @Override
     public Card save(CardRequestDTO dto, UUID account_id) {
@@ -68,8 +75,19 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Optional<Card[]> getByUserId(UUID userId) {
-        return Optional.empty();
+    public List<Card> getCardsByAccountId(UUID accountId) {
+
+        Account account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName()
+        )).orElseThrow(() -> new UnauthorizedException("User not authorized"));
+
+        if (accountRepository.existsById(accountId) && account.getId() == accountId){
+            return cardRepository.findAllByAccountId(accountId);
+        }
+
+        throw new ResourceNotFoundException("Account not found");
     }
 
     @Override
