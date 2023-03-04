@@ -49,6 +49,9 @@ public class User implements Serializable {
     @Size(min = 10, max = 15)
     private String phone;
 
+    @Column(unique = true)
+    private UUID accountNumber;
+
     public User(String id) {
         this.Id = UUID.fromString(id);
     }

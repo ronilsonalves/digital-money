@@ -9,8 +9,10 @@ import com.digitalhouse.money.usersservice.data.model.User;
 import com.digitalhouse.money.usersservice.exceptionhandler.InvalidCredentialsException;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.hc.client5.http.auth.Credentials;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UserProfileResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -75,7 +77,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             CredentialRepresentation passwordCred = new CredentialRepresentation();
             String userId = CreatedResponseUtil.getCreatedId(userResponse);
             passwordCred.setTemporary(false);
-            passwordCred.setType("password");
+            passwordCred.setType(CredentialRepresentation.PASSWORD);
             passwordCred.setValue(user.getPassword());
             UserResource userResource = keycloak.realm(realm).users().get(userId);
             userResource.resetPassword(passwordCred);
@@ -87,6 +89,44 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             log.info(e.getMessage());
             throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException(
                     "Please, verify the provided data for fields on RequestBody and try again.");
+        }
+    }
+
+    /**
+     * Perform an update from Keycloak user's information Keycloak.
+     * @param userID provided at request
+     * @param user provided at request
+     * @return User updated
+     * @throws com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException if for any reason the fields
+     * are invalid
+     * @throws ResourceNotFoundException if a non-existent UUID is provided
+     */
+    public User updateUser(UUID userID,UserRequestBody user) {
+        try {
+            UserResource resource = keycloak.realm(realm).users().get(String.valueOf(userID));
+            UserRepresentation representation = new UserRepresentation();
+            if (user.getPassword() != null) {
+                CredentialRepresentation passwordCred = new CredentialRepresentation();
+                passwordCred.setTemporary(false);
+                passwordCred.setType(CredentialRepresentation.PASSWORD);
+                passwordCred.setValue(user.getPassword().trim());
+                representation.setCredentials(Collections.singletonList(passwordCred));
+            }
+            representation.setFirstName(user.getName());
+            representation.setLastName(user.getLastName());
+            representation.setEmail(user.getEmail());
+            resource.update(representation);
+            return findUserByUUID(userID);
+        } catch (BadRequestException e) {
+            log.warning("Exception: "+e);
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException(
+                    "An error occurred while trying to update user, please check the fields and try again."
+            );
+        } catch (NotFoundException e) {
+            log.warning("Not Found: "+e);
+            throw new ResourceNotFoundException(
+                    "There's no user registered in Keycloak with provided UUID."
+            );
         }
     }
 
