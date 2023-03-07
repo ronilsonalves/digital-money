@@ -9,11 +9,11 @@ import java.util.UUID;
 
 public interface CardService {
 
-    Card save(CardRequestDTO card, UUID account_id);
+    Card save(CardRequestDTO card, UUID accountId);
 
-    Optional<Card> getById(UUID id);
+    Card getById(UUID accountId, UUID id);
 
     List<Card> getCardsByAccountId(UUID accountId);
 
-    void delete(Card card);
+    void delete(UUID accountId, UUID id);
 }

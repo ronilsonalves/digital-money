@@ -10,12 +10,11 @@ import com.digitalhouse.money.accountservice.exceptionhandler.ConflictException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.service.CardService;
+import com.digitalhouse.money.accountservice.util.VerifyAuthenticationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.NotAuthorizedException;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -32,6 +31,9 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     CardRepository cardRepository;
+
+    @Autowired
+    VerifyAuthenticationUtil verifyAuthenticationUtil;
 
     @Override
     public Card save(CardRequestDTO dto, UUID account_id) {
@@ -70,30 +72,58 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Optional<Card> getById(UUID id) {
-        return Optional.empty();
+    public Card getById(UUID accountId, UUID id) {
+        List<Card> accountCards = getCardsByAccountId(accountId);
+
+        return accountCards.stream()
+                .filter(card -> card.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
     }
 
     @Override
     public List<Card> getCardsByAccountId(UUID accountId) {
 
-        Account account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
+        Optional<Account> account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName()
-        )).orElseThrow(() -> new UnauthorizedException("User not authorized"));
+        ));
 
-        if (accountRepository.existsById(accountId) && account.getId() == accountId){
-            return cardRepository.findAllByAccountId(accountId);
+        if (!(accountRepository.existsById(accountId))) {
+            throw new ResourceNotFoundException("Account not found");
         }
 
-        throw new ResourceNotFoundException("Account not found");
+        if (account.isPresent()) {
+
+            if (!account.get().getId().equals(accountId)) {
+                throw new UnauthorizedException("User not authorized");
+            }
+
+        }
+
+        return cardRepository.findAllByAccountId(accountId);
     }
 
     @Override
-    public void delete(Card card) {
+    public void delete(UUID accountId, UUID id) {
 
+        Optional<Account> account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName()
+        ));
+
+        if (account.isPresent()) {
+            if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.get().getUserId())) {
+                throw new UnauthorizedException("User not authorized");
+            }
+        }
+
+        if (!cardRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Card not found");
+        }
+
+        repository.deleteById(id);
     }
-
-
 }

@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -31,12 +32,27 @@ public class CardController {
 
         Card savedCard = service.save(cardRequestDTO,accountId);
 
-        return new ResponseEntity(savedCard, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
     }
 
     @GetMapping("/accounts/{accountId}/cards")
     public ResponseEntity<List<Card>> getCardsByAccountId(@PathVariable UUID accountId)
             throws UnauthorizedException, ResourceNotFoundException {
         return new ResponseEntity<>(service.getCardsByAccountId(accountId), HttpStatus.OK);
+    }
+
+    @GetMapping("/accounts/{accountId}/cards/{cardId}")
+    public ResponseEntity<Card> getCardById(@PathVariable UUID accountId, @PathVariable UUID cardId)
+            throws UnauthorizedException, ResourceNotFoundException {
+        System.out.println(service.getById(accountId, cardId).toString());
+
+        return new ResponseEntity<>(service.getById(accountId, cardId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/accounts/{accountId}/cards/{cardId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID accountId, @PathVariable UUID cardId)
+            throws UnauthorizedException, ResourceNotFoundException {
+        service.delete(accountId, cardId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
