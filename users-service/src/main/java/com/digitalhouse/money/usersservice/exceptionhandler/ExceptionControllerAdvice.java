@@ -42,4 +42,14 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(error,HttpStatus.UNAUTHORIZED);
     }
+
+    @ResponseBody
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<MessageExceptionHandler> unauthorizedException(UnauthorizedException unauthorizedException) {
+        MessageExceptionHandler error = new MessageExceptionHandler(
+                LocalDateTime.now(),HttpStatus.UNAUTHORIZED.value(), unauthorizedException.getMessage()
+        );
+        return new ResponseEntity<>(error,HttpStatus.UNAUTHORIZED);
+    }
 }

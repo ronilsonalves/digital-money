@@ -31,7 +31,9 @@ public class AccountController {
     }
 
     @GetMapping("accounts/{account_id}")
-    public  Account getAccountById(@RequestParam UUID account_id){
+    @PreAuthorize("isAuthenticated()")
+    public Account getAccountById(@PathVariable UUID account_id){
+        System.out.println(account_id);
         return service.getById(account_id);
     }
 }
