@@ -12,5 +12,7 @@ public interface IUserKeycloakRepository {
 
     User save(UserRequestBody user);
 
+    User updateUser(UUID userUUID, UserRequestBody user);
+
     void logout(String token);
 }
