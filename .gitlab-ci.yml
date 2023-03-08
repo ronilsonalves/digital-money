@@ -3,20 +3,18 @@ stages:          # List of stages for jobs, and their order of execution
   - test
   - deploy
 
-build-docker-imgs:       # This job runs in the build stage, which runs first.
+variables:
+  DOCKER_HOST: tcp://dockerhost:2375/
+  # Use the overlayfs driver for improved performance:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
 
+build-kc-img:
   image: docker:latest
   stage: build
   services:
-   - name: docker:dind
-     alias: dockerhost
-  variables:
-    # Tell docker CLI how to talk to Docker daemon; see
-    # https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker-executor
-    DOCKER_HOST: tcp://dockerhost:2375/
-    # Use the overlayfs driver for improved performance:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
+    - name: docker:dind
+      alias: dockerhost
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
@@ -29,21 +27,75 @@ build-docker-imgs:       # This job runs in the build stage, which runs first.
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - echo "Building keycloak sec docker img..."
-    - echo ls -a
-    - docker build -t "auth-service:${tag}" -f ./keycloak
-    - docker push "auth-service:${tag}"  
+    - docker build -f keycloak/Dockerfile -t "auth-service:${tag}"
+    - docker push "auth-service:${tag}"
+    - echo "Built keycloak..."
 
+build-discovery-img:
+  image: docker:latest
+  stage: build
+  services:
+    - name: docker:dind
+      alias: dockerhost
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag="develop"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
     - echo "Building service-discovery docker img..."
-    - docker build -t "discovery:${tag}" -f ./service-discovery
+    - docker build -f service-discovery/Dockerfile -t "discovery:${tag}"
     - docker push "discovery:${tag}"
+    - echo "Built service discovery..."
 
-    - echo "Building users-service docker img...." 
-    - docker build -t "users-service:${tag}" -f ./users-service
+build-users-img:
+  image: docker:latest
+  stage: build
+  services:
+    - name: docker:dind
+      alias: dockerhost
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag="develop"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
+    - echo "Building users-service docker img..."
+    - docker build -f users-service/Dockerfile -t "users-service:${tag}"
     - docker push "users-service:${tag}"
+    - echo "Built users-service..."
 
+build-accounts-img:
+  image: docker:latest
+  stage: build
+  services:
+    - name: docker:dind
+      alias: dockerhost
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "$CI_DEFAULT_BRANCH" ]]; then
+        tag=""
+        echo "Running on default branch '$CI_DEFAULT_BRANCH': tag = 'latest'"
+      else
+        tag="develop"
+        echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
+      fi
     - echo "Building accounts-service docker img..."
-    - docker build -t "accounts-service:${tag}" -f ./account-service
+    - docker build -f account-service/Dockerfile -t "accounts-service:${tag}"
     - docker push "accounts-service:${tag}"
+    - echo "Built accounts-service..."
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
