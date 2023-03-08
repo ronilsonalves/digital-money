@@ -60,3 +60,9 @@ logging:
     org.springframework.security: DEBUG
     org.springframework.http: DEBUG
     org.springdoc: WARN
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: ${CLIENT_ID_BACKEND}
+      client-secret: ${CLIENT_SECRET_BACKEND}

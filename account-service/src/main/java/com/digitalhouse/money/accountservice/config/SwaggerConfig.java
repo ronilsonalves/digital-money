@@ -2,6 +2,8 @@ package com.digitalhouse.money.accountservice.config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.OAuthFlow;
+import io.swagger.v3.oas.annotations.security.OAuthFlows;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -12,7 +14,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@SecurityScheme(name = "BearerAuth",  scheme = "bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
+@SecurityScheme(name = "BearerAuth", type = SecuritySchemeType.OAUTH2, flows = @OAuthFlows(
+        authorizationCode = @OAuthFlow(
+                authorizationUrl = "http://localhost:8070/realms/digitalmoney/protocol/openid-connect/auth",
+                refreshUrl = "http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token",
+                tokenUrl = "http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token"
+        )
+))
 public class SwaggerConfig {
 
     @Bean
