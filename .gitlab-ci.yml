@@ -30,19 +30,19 @@ build-docker-imgs:       # This job runs in the build stage, which runs first.
       fi
     - echo "Building keycloak sec docker img..."
     - echo ls -a
-    - docker build -t "auth-service:${tag}" -f Dockerfile ./keycloak
+    - docker build -t "auth-service:${tag}" -f ./keycloak
     - docker push "auth-service:${tag}"  
 
     - echo "Building service-discovery docker img..."
-    - docker build -t "discovery:${tag}" -f Dockerfile ./service-discovery
+    - docker build -t "discovery:${tag}" -f ./service-discovery
     - docker push "discovery:${tag}"
 
     - echo "Building users-service docker img...." 
-    - docker build -t "users-service:${tag}" -f Dockerfile ./users-service
+    - docker build -t "users-service:${tag}" -f ./users-service
     - docker push "users-service:${tag}"
 
     - echo "Building accounts-service docker img..."
-    - docker build -t "accounts-service:${tag}" -f Dockerfile ./account-service
+    - docker build -t "accounts-service:${tag}" -f ./account-service
     - docker push "accounts-service:${tag}"
 
 unit-test-job:   # This job runs in the test stage.
