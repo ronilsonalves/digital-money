@@ -4,7 +4,6 @@ import com.digitalhouse.money.accountservice.data.dto.CardRequestDTO;
 import com.digitalhouse.money.accountservice.data.model.Card;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface CardService {

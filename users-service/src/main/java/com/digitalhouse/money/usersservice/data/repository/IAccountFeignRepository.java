@@ -2,9 +2,11 @@ package com.digitalhouse.money.usersservice.data.repository;
 
 import com.digitalhouse.money.usersservice.api.request.AccountCreateRequestDTO;
 import com.digitalhouse.money.usersservice.api.response.AccountResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.UUID;
 

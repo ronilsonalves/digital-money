@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import javax.ws.rs.DefaultValue;
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.time.LocalDate;

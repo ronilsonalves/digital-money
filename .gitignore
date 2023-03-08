@@ -2,3 +2,5 @@
 /users-service/target/
 /.idea/
 /.vscode/
+
+application-test.yml

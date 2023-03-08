@@ -5,7 +5,6 @@ import com.digitalhouse.money.usersservice.api.request.UserRequestBody;
 import com.digitalhouse.money.usersservice.api.request.UserResetPasswordRequest;
 import com.digitalhouse.money.usersservice.api.response.UserResponse;
 import com.digitalhouse.money.usersservice.api.service.UserService;
-import com.digitalhouse.money.usersservice.data.model.User;
 import com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

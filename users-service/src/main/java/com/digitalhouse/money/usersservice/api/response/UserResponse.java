@@ -1,6 +1,5 @@
 package com.digitalhouse.money.usersservice.api.response;
 
-import com.digitalhouse.money.usersservice.data.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
