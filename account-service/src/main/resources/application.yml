@@ -3,9 +3,9 @@ spring:
     name: account-service
 
   datasource:
-    url: jdbc:mysql://localhost:3307/account-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
-    username: account-service
-    password: account-service
+    url: jdbc:mysql://${ACC_SVC_DB_URL}/account-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: ${ACC_SVC_DB_USER}
+    password: ${ACC_SVC_DB_PASS}
   jpa:
     hibernate:
       ddl-auto: update
@@ -50,7 +50,7 @@ eureka:
 digitalmoney:
   keycloak:
     realm: digitalmoney
-    serverUrl: http://localhost:8070/
+    serverUrl: ${KEYCLOAK_SERVER_URL}
     clientId: ${CLIENT_ID_BACKEND}
     clientSecret: ${CLIENT_SECRET_BACKEND}
     usersInfoEndpoint: "${digitalmoney.keycloak.serverUrl}/realms/${digitalmoney.keycloak.realm}/protocol/openid-connect/userinfo"

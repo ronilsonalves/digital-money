@@ -1,7 +1,7 @@
 digitalmoney:
   keycloak:
     realm: digitalmoney
-    serverUrl: http://localhost:8070/
+    serverUrl: ${KEYCLOAK_SERVER_URL}
     clientId: ${CLIENT_ID_BACKEND}
     clientSecret: ${CLIENT_SECRET_BACKEND}
     clientIdUsers: ${CLIENT_ID_USERS}
@@ -13,9 +13,9 @@ spring:
     name: users-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/users-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
-    username: users-service
-    password: users-service
+    url: jdbc:mysql://${USR_SVC_DB_URL}:3306/users-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: ${USR_SVC_DB_USER}
+    password: ${USR_SVC_DB_PASS}
   jpa:
     hibernate:
       ddl-auto: update
