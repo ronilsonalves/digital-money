@@ -2,13 +2,12 @@ stages:          # List of stages for jobs, and their order of execution
   - build
   - test
   - deploy
-
-build-kc-img:
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
+variables:
+  DOCKER_HOST: tcp://dockerhost:2375/
     # Use the overlayfs driver for improved performance:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+build-kc-img:
   image: docker:latest
   stage: build
   services:
@@ -31,11 +30,6 @@ build-kc-img:
     - echo "Built keycloak..."
 
 build-discovery-img:
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    # Use the overlayfs driver for improved performance:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   image: docker:latest
   stage: build
   services:
@@ -58,11 +52,6 @@ build-discovery-img:
     - echo "Built service discovery..."
 
 build-users-img:
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    # Use the overlayfs driver for improved performance:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   image: docker:latest
   stage: build
   services:
@@ -85,11 +74,6 @@ build-users-img:
     - echo "Built users-service..."
 
 build-accounts-img:
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    # Use the overlayfs driver for improved performance:
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   image: docker:latest
   stage: build
   services:
