@@ -27,7 +27,7 @@ build-kc-img:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - echo "Building keycloak sec docker img..."
-    - docker build -f keycloak/Dockerfile -t "auth-service:${tag}"
+    - docker build -f keycloak/Dockerfile -t "auth-service:${tag}" ./grupo-2/keycloak
     - docker push "auth-service:${tag}"
     - echo "Built keycloak..."
 
@@ -49,7 +49,7 @@ build-discovery-img:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - echo "Building service-discovery docker img..."
-    - docker build -f service-discovery/Dockerfile -t "discovery:${tag}"
+    - docker build -f service-discovery/Dockerfile -t "discovery:${tag}" ./grupo-2/service-discovery
     - docker push "discovery:${tag}"
     - echo "Built service discovery..."
 
@@ -71,7 +71,7 @@ build-users-img:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - echo "Building users-service docker img..."
-    - docker build -f users-service/Dockerfile -t "users-service:${tag}"
+    - docker build -f users-service/Dockerfile -t "users-service:${tag}" ./grupo-2/users-service
     - docker push "users-service:${tag}"
     - echo "Built users-service..."
 
@@ -93,7 +93,7 @@ build-accounts-img:
         echo "Running on branch '$CI_COMMIT_BRANCH': tag = $tag"
       fi
     - echo "Building accounts-service docker img..."
-    - docker build -f account-service/Dockerfile -t "accounts-service:${tag}"
+    - docker build -f account-service/Dockerfile -t "accounts-service:${tag}" ./grupo-2/account-service
     - docker push "accounts-service:${tag}"
     - echo "Built accounts-service..."
 
