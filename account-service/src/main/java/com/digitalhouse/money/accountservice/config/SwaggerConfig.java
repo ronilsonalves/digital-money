@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @SecurityScheme(name = "BearerAuth", type = SecuritySchemeType.OAUTH2, flows = @OAuthFlows(
         authorizationCode = @OAuthFlow(
-                authorizationUrl = "http://localhost:8070/realms/digitalmoney/protocol/openid-connect/auth",
-                refreshUrl = "http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token",
-                tokenUrl = "http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token"
+                authorizationUrl = "https://auth.pi.ronilsonalves.com/realms/digitalmoney/protocol/openid-connect/auth",
+                refreshUrl = "https://auth.pi.ronilsonalves.com/realms/digitalmoney/protocol/openid-connect/token",
+                tokenUrl = "https://auth.pi.ronilsonalves.com/realms/digitalmoney/protocol/openid-connect/token"
         )
 ))
 public class SwaggerConfig {

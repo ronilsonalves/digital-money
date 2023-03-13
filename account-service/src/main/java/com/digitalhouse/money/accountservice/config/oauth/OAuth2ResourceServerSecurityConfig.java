@@ -45,6 +45,6 @@ public class OAuth2ResourceServerSecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return JwtDecoders.fromIssuerLocation("http://localhost:8070/realms/digitalmoney");
+        return JwtDecoders.fromIssuerLocation("https://auth.pi.ronilsonalves.com/realms/digitalmoney");
     }
 }
