@@ -15,14 +15,12 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferDTO {
-    @NotNull
+public class TransferResponseDTO {
+    private UUID uuid;
     private UUID originAccountNumber;
-    @NotNull
     private UUID recipientAccountNumber;
     private BigDecimal transactionAmount;
     private LocalDate transactionDate;
-    @NotNull
     private TransactionType transactionType;
     private String description;
 }
