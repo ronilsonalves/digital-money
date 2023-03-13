@@ -52,4 +52,13 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
+    @ResponseBody
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<MessageExceptionHandler> insufficientFundsException(InsufficientFundsException insufficientFundsException) {
+        MessageExceptionHandler error = new MessageExceptionHandler(
+                LocalDateTime.now(), HttpStatus.GONE.value(), insufficientFundsException.getMessage()
+        );
+        return new ResponseEntity<>(error, HttpStatus.GONE);
+    }
+
 }
