@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind:
+  Deployment
+metadata:
+  name: users-service
+  namespace: default
+  labels:
+    app: users
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users
+          image: digitalmoneydev.azurecr.io/users-service:develop
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /swagger-ui/index.html
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 1
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: acr-secret
