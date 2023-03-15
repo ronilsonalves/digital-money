@@ -43,12 +43,14 @@ spec:
               value: users-service
             - name: USR_SVC_DB_PASS
               value: 6hpFI32U74D3
+            - name: EUREKA_SERVER_URL
+              value: service-discovery
           readinessProbe:
             httpGet:
               path: /swagger-ui/index.html
               port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 1
+            initialDelaySeconds: 30
+            periodSeconds: 30
           imagePullPolicy: Always
       imagePullSecrets:
         - name: acr-secret

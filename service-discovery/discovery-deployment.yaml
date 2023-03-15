@@ -26,8 +26,8 @@ spec:
             httpGet:
               path: /
               port: 8761
-            initialDelaySeconds: 60
-            periodSeconds: 1
+            initialDelaySeconds: 30
+            periodSeconds: 30
           imagePullPolicy: Always
       imagePullSecrets:
         - name: acr-secret

@@ -8,7 +8,7 @@ metadata:
 spec:
   ports:
     - name: http
-      port: 80
+      port: 8761
       targetPort: 8761
   selector:
     app: eureka
