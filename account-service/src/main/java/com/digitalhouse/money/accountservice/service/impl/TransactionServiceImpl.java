@@ -15,9 +15,7 @@ import com.digitalhouse.money.accountservice.service.TransactionService;
 import com.digitalhouse.money.accountservice.util.VerifyAuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -156,8 +154,10 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<TransactionResponseDTO> listLastFiveTransactionsByAccount(UUID accountId) throws ResourceNotFoundException {
-        Example<Transaction> example = Example.of(Transaction.builder().originAccountNumber(accountId).recipientAccountNumber(accountId).build());
-        Pageable page = Pageable.ofSize(5);
+        Sort order = Sort.by(Sort.Direction.DESC, "transactionDate");
+        Example<Transaction> example =
+                Example.of(Transaction.builder().originAccountNumber(accountId).recipientAccountNumber(accountId).build(), ExampleMatcher.matchingAny());
+        Pageable page = PageRequest.of(0,5, order);
         Page<Transaction> all = repository.findAll(example, page);
         return all.map(this::createResponse).toList();
     }
