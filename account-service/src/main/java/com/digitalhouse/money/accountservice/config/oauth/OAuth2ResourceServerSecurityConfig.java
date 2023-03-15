@@ -1,5 +1,6 @@
 package com.digitalhouse.money.accountservice.config.oauth;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -12,6 +13,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableMethodSecurity
 public class OAuth2ResourceServerSecurityConfig {
+
+    @Value("${KEYCLOAK_SERVER_URL}")
+    private String keycloakServerURL;
+
+    @Value("${digitalmoney.keycloak.realm}")
+    private String realm;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -45,6 +52,6 @@ public class OAuth2ResourceServerSecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return JwtDecoders.fromIssuerLocation("https://auth.pi.ronilsonalves.com/realms/digitalmoney");
+        return JwtDecoders.fromIssuerLocation(keycloakServerURL+"realms/"+realm);
     }
 }
