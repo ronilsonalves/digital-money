@@ -49,6 +49,9 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     @Value("${digitalmoney.keycloak.clientSecretUsers}")
     private String clientSecret;
 
+    @Value("${KEYCLOAK_SERVER_URL}")
+    private String keycloakServerURL;
+
     @Value("${digitalmoney.keycloak.usersInfoEndpoint}")
     private String usersInfoEndpoint;
 
@@ -174,7 +177,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
 
     public Object login(UserLoginRequestBody userLoginRequestBody) {
         try {
-            Keycloak keycloak1 = Keycloak.getInstance("https://auth.pi.ronilsonalves.com/",realm,
+            Keycloak keycloak1 = Keycloak.getInstance(keycloakServerURL,realm,
                     userLoginRequestBody.getEmail(), userLoginRequestBody.getPassword(),clientId,
                     clientSecret,null,null,false,null,"openid");
 
