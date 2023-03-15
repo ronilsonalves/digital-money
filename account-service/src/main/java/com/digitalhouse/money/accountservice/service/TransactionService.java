@@ -60,4 +60,6 @@ public interface TransactionService {
             BadRequestException,
             ResourceNotFoundException,
             UnauthorizedException;
-}
+    List<TransactionResponseDTO> listLastFiveTransactionsByAccount(UUID accountId) throws ResourceNotFoundException;
+};
+
