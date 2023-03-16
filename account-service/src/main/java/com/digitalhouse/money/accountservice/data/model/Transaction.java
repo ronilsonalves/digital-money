@@ -32,6 +32,8 @@ public class Transaction {
 
     private UUID cardIdentification;
 
+    private String cardEnding;
+
     private UUID recipientAccountNumber;
 
     private BigDecimal transactionAmount;
