@@ -52,7 +52,7 @@ public class TransferController {
             @RequestParam(defaultValue = "10") int pageSize
     ) throws UnauthorizedException, ResourceNotFoundException {
         List<ITransferResponseDTO> transfers;
-        Pageable pagging = PageRequest.of(page,pageSize);
+        Pageable pagging = PageRequest.of(page-1,pageSize);
         Page<ITransferResponseDTO> pageTransfers= service.listAllByAccountOriginAndTypeOrdByDate(accountId,transactionType,
                 pagging);
 
@@ -60,7 +60,7 @@ public class TransferController {
 
         Map<String, Object> response = new HashMap<>();
         response.put("transfers",transfers);
-        response.put("currentPage",pageTransfers.getNumber());
+        response.put("currentPage",pageTransfers.getNumber()+1);
         response.put("totalItems", pageTransfers.getTotalElements());
         response.put("totalPages",pageTransfers.getTotalPages());
         return response;

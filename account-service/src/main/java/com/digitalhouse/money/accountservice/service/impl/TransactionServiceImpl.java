@@ -60,11 +60,9 @@ public class TransactionServiceImpl implements TransactionService {
             transactionData.setRecipientAccountNumber(accountId);
             transactionData.setTransactionDate(LocalDate.now());
             BeanUtils.copyProperties(transactionData, toSave);
+            toSave.setCardEnding(cardRepository.findById(toSave.getCardIdentification())
+                    .get().getNumber().toString().substring(12));
             BeanUtils.copyProperties(repository.save(toSave), response);
-            response.setCardEnding(
-                    cardRepository.findById(transactionData.getCardIdentification())
-                            .get().getNumber().toString().substring(12)
-            );
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
 
@@ -172,11 +170,6 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionResponseDTO createResponse(Transaction transaction) {
         TransactionResponseDTO responseDTO = new TransactionResponseDTO();
         BeanUtils.copyProperties(transaction, responseDTO);
-        if (transaction.getTransactionType().equals(TransactionType.DEPÓSITO))
-            responseDTO.setCardEnding(
-                    cardRepository.findById(transaction.getCardIdentification())
-                            .get().getNumber().toString().substring(12)
-            );
         return responseDTO;
     }
 }
