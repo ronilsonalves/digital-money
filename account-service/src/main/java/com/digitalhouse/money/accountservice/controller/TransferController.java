@@ -1,9 +1,6 @@
 package com.digitalhouse.money.accountservice.controller;
 
-import com.digitalhouse.money.accountservice.data.dto.TransactionResponseDTO;
-import com.digitalhouse.money.accountservice.data.dto.TransferRequestDTO;
-import com.digitalhouse.money.accountservice.data.dto.ITransferResponseDTO;
-import com.digitalhouse.money.accountservice.data.dto.TransferResponseDTO;
+import com.digitalhouse.money.accountservice.data.dto.*;
 import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.exceptionhandler.InsufficientFundsException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
@@ -64,5 +61,11 @@ public class TransferController {
         response.put("totalItems", pageTransfers.getTotalElements());
         response.put("totalPages",pageTransfers.getTotalPages());
         return response;
+    }
+
+    @GetMapping("/accounts/{accountId}/transfers/recent")
+    @ResponseStatus(HttpStatus.OK)
+    public List<LastFiveTransfersDTO> listLastFiveRecentAccounts(@PathVariable UUID accountId) throws UnauthorizedException, ResourceNotFoundException {
+        return service.listLastFiveAccountsTransferred(accountId);
     }
 }

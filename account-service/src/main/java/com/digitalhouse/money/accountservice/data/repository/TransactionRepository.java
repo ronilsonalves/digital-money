@@ -1,5 +1,6 @@
 package com.digitalhouse.money.accountservice.data.repository;
 
+import com.digitalhouse.money.accountservice.data.dto.ILastFiveTransfers;
 import com.digitalhouse.money.accountservice.data.dto.ITransferResponseDTO;
 import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.data.model.Transaction;
@@ -20,4 +21,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     Page<ITransferResponseDTO> findAllByOriginAccountNumberAndTransactionTypeOrderByTransactionDate(
             UUID origin, TransactionType type, Pageable pageable
             );
+
+    @Query("SELECT DISTINCT t.recipientAccountNumber AS transactionDestination, MAX(t.transactionDate) AS " +
+            "transactionDate FROM Transaction t " +
+            "WHERE t.originAccountNumber = ?1 AND t.transactionType = ?2 GROUP BY transactionDestination")
+    List<ILastFiveTransfers> findTop5RecipientAccountNumberAndTransactionDateByOriginAccountNumber(
+            UUID originAccountNumber,
+            TransactionType transactionType);
 }

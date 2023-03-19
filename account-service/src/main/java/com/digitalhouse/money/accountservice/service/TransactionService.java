@@ -60,6 +60,18 @@ public interface TransactionService {
             BadRequestException,
             ResourceNotFoundException,
             UnauthorizedException;
+
     List<TransactionResponseDTO> listLastFiveTransactionsByAccount(UUID accountId) throws ResourceNotFoundException;
+
+    /**
+     * Return a list with last five accounts where user transferred money containing with titular´s name, account
+     * number and last transaction date.
+     * @param accountId is the origin of transaction, the account of user logged.
+     * @return a list with last five accounts where user transferred money containing titular´s name, account number
+     * and last transaction date.
+     * @throws ResourceNotFoundException if accountId (originAccountNumber) not exists
+     * @throws UnauthorizedException if user is trying to fetch data from another user.
+     */
+    List<LastFiveTransfersDTO> listLastFiveAccountsTransferred(UUID accountId) throws ResourceNotFoundException, UnauthorizedException;
 };
 
