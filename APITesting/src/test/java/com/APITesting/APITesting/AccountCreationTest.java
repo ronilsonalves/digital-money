@@ -5,12 +5,15 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 
 public class AccountCreationTest {
 
     @Test
+    @Tag("Spring 1")
     public void UsersAccountCreationTest_validInputShouldReturnCode201AndId() {
-        RestAssured.baseURI = "http://localhost:8081";
+//        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
@@ -28,8 +31,10 @@ public class AccountCreationTest {
     }
 
     @Test
+    @Tag("Spring 1")
     public void UsersAccountCreationTest_invalidInputShouldGiveCode400() {
-        RestAssured.baseURI = "http://localhost:8081";
+//        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"

@@ -5,12 +5,15 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 
 public class PasswordResetTest {
 
     @Test
+    @Tag("Spring 1")
     public void PasswordResetTest_validEmailShouldReturnCode200() {
-        RestAssured.baseURI = "http://localhost:8081";
+//        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
@@ -23,6 +26,7 @@ public class PasswordResetTest {
     }
 
     @Test
+    @Tag("Spring 1")
     public void PasswordResetTest_invalidEmailShouldReturnCode404AndProperMessage() {
         RestAssured.baseURI = "http://localhost:8081";
         RequestSpecification request = RestAssured.given();
