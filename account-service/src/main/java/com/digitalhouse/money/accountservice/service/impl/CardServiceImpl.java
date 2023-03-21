@@ -38,16 +38,19 @@ public class CardServiceImpl implements CardService {
     @Override
     public Card save(CardRequestDTO dto, UUID account_id) {
 
+        Account account = accountRepository.findById(account_id
+        ).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
         if (repository.existsByNumber(dto.getNumber())) {
             throw new ConflictException("Cartão já esteja associado a uma conta");
         }
 
-        if (!accountRepository.existsById(account_id)) {
-            throw new BadRequestException("Invalid Account ");
-        }
-
         if (dto.getNumber().toString().length() != 16){
             throw new BadRequestException("Invalid card number size");
+        }
+
+        if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId())){
+            throw new UnauthorizedException("User not authorized");
         }
 
         try {
@@ -108,19 +111,18 @@ public class CardServiceImpl implements CardService {
     @Override
     public void delete(UUID accountId, UUID id) {
 
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
+
         Account account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName()
         )).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
-        if (!account.getId().equals(accountId)) {
+        if (!account.getId().equals(accountId) || !card.getAccountId().equals(accountId)) {
                 throw new UnauthorizedException("User not authorized");
             }
-
-        if (!cardRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Card not found");
-        }
 
         repository.deleteById(id);
     }
