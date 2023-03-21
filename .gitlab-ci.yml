@@ -38,9 +38,9 @@ acc_svc_deploy_stage:
         - ssh-keyscan -H $AWS_DEPLOY_SERVER_IP >> ~/.ssh/known_hosts
     script:
         - echo "Deploying started..."
-        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "~/apps/./accounts_service.sh stop"
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./accounts_service.sh stop"
         - scp ./account-service/target/account-service-0.0.1-SNAPSHOT.jar ubuntu@$AWS_DEPLOY_SERVER_IP:~/pi/account-service/target
-        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "~/apps/./accounts_service.sh start"
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./accounts_service.sh start"
         - echo "Finished deploying the app."
     dependencies:
         - acc_svc_build_stage 
@@ -85,9 +85,9 @@ usr_svc_deploy_stage:
         - ssh-keyscan -H $AWS_DEPLOY_SERVER_IP >> ~/.ssh/known_hosts
     script:
         - echo "Deploying started..."
-        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "~/apps/./users_service.sh stop"
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./users_service.sh stop"
         - scp ./users-service/target/users-service-0.0.1-SNAPSHOT.jar ubuntu@$AWS_DEPLOY_SERVER_IP:~/pi/users-service/target
-        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "~/apps/./users_service.sh start"
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./users_service.sh start"
         - echo "Finished deploying the app."
     dependencies:
         - usr_svc_build_stage 
