@@ -3,6 +3,7 @@ package com.digitalhouse.money.accountservice.service.impl;
 import com.digitalhouse.money.accountservice.data.dto.*;
 import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.data.model.Account;
+import com.digitalhouse.money.accountservice.data.model.Card;
 import com.digitalhouse.money.accountservice.data.model.Transaction;
 import com.digitalhouse.money.accountservice.data.repository.*;
 import com.digitalhouse.money.accountservice.exceptionhandler.BadRequestException;
@@ -47,10 +48,15 @@ public class TransactionServiceImpl implements TransactionService {
         Account account = accountRepository.findById(accountId).orElseThrow(() ->
                 new ResourceNotFoundException("There's no account with number provided."));
 
-        if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()))
-            throw new UnauthorizedException("User not authorized");
+        Card card = cardRepository.findById(transactionData.getCardIdentification()).orElseThrow(() ->
+                new ResourceNotFoundException("There's no card with ID provided."));
 
-        if (transactionData.getTransactionType().equals(TransactionType.DEPÓSITO) && cardRepository.existsById(transactionData.getCardIdentification())) {
+        if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()) || !account.getId().equals(card.getAccountId()))
+            throw new UnauthorizedException("User not authorized to perform this action.");
+
+        if (transactionData.getTransactionType().equals(TransactionType.DEPÓSITO)) {
+            if (transactionData.getTransactionDate().isBefore(LocalDate.now()))
+                throw new BadRequestException("Invalid date. Transaction date must be today or after.");
             Transaction toSave = new Transaction();
             TransactionResponseDTO response = new TransactionResponseDTO();
             transactionData.setOriginAccountNumber(accountId);
@@ -62,12 +68,11 @@ public class TransactionServiceImpl implements TransactionService {
             BeanUtils.copyProperties(repository.save(toSave), response);
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
-
             accountRepository.save(account);
             return response;
         }
         throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " +
-                "money in our wallet, soon new methods will be implemented.");
+                "money in our wallet, soon new methods will be available.");
     }
 
     /**
@@ -93,6 +98,8 @@ public class TransactionServiceImpl implements TransactionService {
             throw new UnauthorizedException("User not authorized");
 
         if (transferData.getTransactionType().equals(TransactionType.TRANSFERÊNCIA)) {
+            if (transferData.getTransactionDate().isBefore(LocalDate.now()))
+                throw new BadRequestException("Invalid date. The transaction date must be today or after.");
             Transaction toSave = new Transaction();
             TransferResponseDTO response = new TransferResponseDTO();
             if (transferData.getTransactionAmount().compareTo(account.getAvailable_amount()) >= 0)
