@@ -5,12 +5,15 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Tag;
 
 public class LoginTest {
 
     @Test
+    @Tag("Spring 1")
     public void LoginTest_validCredentialsShouldReturnCode200AndBearerToken() {
-        RestAssured.baseURI = "http://localhost:8081";
+//        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
@@ -24,8 +27,10 @@ public class LoginTest {
     }
 
     @Test
+    @Tag("Spring 1")
     public void LoginTest_nonexistentUserShouldReturnCode404AndProperMessage() {
-        RestAssured.baseURI = "http://localhost:8081";
+//        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
@@ -39,8 +44,10 @@ public class LoginTest {
     }
 
     @Test
+    @Tag("Spring 1")
     public void LoginTest_wrongPasswordShouldReturnCode401AndProperMessage() {
-        RestAssured.baseURI = "http://localhost:8081";
+//        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
