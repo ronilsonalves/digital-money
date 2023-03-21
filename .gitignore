@@ -1,0 +1,6 @@
+/users-service/users-service.iml
+/users-service/target/
+/.idea/
+/.vscode/
+
+application-test.yml

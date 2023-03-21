@@ -1,0 +1,61 @@
+digitalmoney:
+  keycloak:
+    realm: digitalmoney
+    serverUrl: ${KEYCLOAK_SERVER_URL}
+    clientId: ${CLIENT_ID_BACKEND}
+    clientSecret: ${CLIENT_SECRET_BACKEND}
+    clientIdUsers: ${CLIENT_ID_USERS}
+    clientSecretUsers: ${CLIENT_SECRET_USERS}
+    usersInfoEndpoint: "${digitalmoney.keycloak.serverUrl}/realms/${digitalmoney.keycloak.realm}/protocol/openid-connect/userinfo"
+
+spring:
+  application:
+    name: users-service
+
+  datasource:
+    url: jdbc:mysql://${USR_SVC_DB_URL}:3306/users-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: ${USR_SVC_DB_USER}
+    password: ${USR_SVC_DB_PASS}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    generate-ddl: true
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak-registration:
+            provider: keycloak-provider
+            client-id: ${CLIENT_ID_BACKEND}
+            authorization-grant-type: client_credentials
+            client-secret: ${CLIENT_SECRET_BACKEND}
+        provider:
+          keycloak-provider:
+            token-uri: ${REALM_TOKEN_URI}
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
+server:
+  port: 8081
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 0.0.1
+    description: Users service
+  svc:
+    port: ${server.port}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+springdoc:
+  packages-to-scan: com.digitalhouse.money.usersservice.api.controller
