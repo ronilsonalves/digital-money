@@ -108,17 +108,15 @@ public class CardServiceImpl implements CardService {
     @Override
     public void delete(UUID accountId, UUID id) {
 
-        Optional<Account> account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
+        Account account = accountRepository.findByUserId(UUID.fromString(SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName()
-        ));
+        )).orElseThrow(() -> new ResourceNotFoundException("Account not found"));
 
-        if (account.isPresent()) {
-            if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.get().getUserId())) {
+        if (!account.getId().equals(accountId)) {
                 throw new UnauthorizedException("User not authorized");
             }
-        }
 
         if (!cardRepository.existsById(id)) {
             throw new ResourceNotFoundException("Card not found");
