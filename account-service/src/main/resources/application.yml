@@ -29,6 +29,13 @@ spring:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
 
+  rabbitmq:
+    host: jackal.rmq.cloudamqp.com
+    port: 5672
+    username: rzchwbxv
+    password: O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD
+    virtual-host: rzchwbxv
+
 server:
   port: 8082
 

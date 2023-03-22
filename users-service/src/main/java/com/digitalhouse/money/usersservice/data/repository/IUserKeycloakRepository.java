@@ -14,5 +14,7 @@ public interface IUserKeycloakRepository {
 
     User updateUser(UUID userUUID, UserRequestBody user);
 
+    void verifyEmailAddress(UUID userID);
+
     void logout(String token);
 }

@@ -115,7 +115,11 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             }
             representation.setFirstName(user.getName());
             representation.setLastName(user.getLastName());
-            representation.setEmail(user.getEmail());
+            if (user.getEmail() != null) {
+                representation.setEmail(user.getEmail());
+                representation.setEnabled(false);
+                representation.setEmailVerified(true);
+            }
             resource.update(representation);
             return findUserByUUID(userID);
         } catch (BadRequestException e) {
@@ -175,6 +179,26 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         }
     }
 
+    /**
+     * Validate a user passing a valid UserId
+     * @param userID provided at user's service request
+     */
+    public void verifyEmailAddress(UUID userID) {
+        try {
+            UserResource resource = keycloak.realm(realm).users().get(String.valueOf(userID));
+            UserRepresentation representation = resource.toRepresentation();
+            representation.setEmailVerified(true);
+            representation.setEnabled(true);
+            resource.update(representation);
+        } catch (NotFoundException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException("Unable to " +
+                    "validate email address, user not found!");
+        }catch (BadRequestException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException("An error occurred " +
+                    "while trying to perform your request, try again later and if error persists contact support. ");
+        }
+    }
+
     public Object login(UserLoginRequestBody userLoginRequestBody) {
         try {
             Keycloak keycloak1 = Keycloak.getInstance(keycloakServerURL,realm,
@@ -201,7 +225,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         userRepresentation.setFirstName(user.getName());
         userRepresentation.setLastName(user.getLastName());
         userRepresentation.setEmail(user.getEmail());
-        userRepresentation.setEnabled(true);
+        userRepresentation.setEnabled(false);
         return userRepresentation;
     }
 

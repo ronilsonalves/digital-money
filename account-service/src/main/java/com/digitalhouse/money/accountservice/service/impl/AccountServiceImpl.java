@@ -6,24 +6,27 @@ import com.digitalhouse.money.accountservice.exceptionhandler.ConflictException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.service.AccountService;
+import com.digitalhouse.money.accountservice.util.MailConstructor;
 import com.digitalhouse.money.accountservice.util.VerifyAuthenticationUtil;
+import lombok.AllArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    AccountRepository repository;
+    private final AccountRepository repository;
 
-    @Autowired
-    VerifyAuthenticationUtil verifyAuthenticationUtil;
+    private final VerifyAuthenticationUtil verifyAuthenticationUtil;
+
     @Override
     public Account save(Account account) {
         if(repository.existsByUserId(account.getUserId()))
-            throw  new ConflictException("User already has account");
+            throw new ConflictException("User already has account");
 
         return repository.save(account);
     }

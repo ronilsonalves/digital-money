@@ -11,8 +11,10 @@ import com.digitalhouse.money.accountservice.exceptionhandler.InsufficientFundsE
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.service.TransactionService;
+import com.digitalhouse.money.accountservice.util.MailConstructor;
 import com.digitalhouse.money.accountservice.util.VerifyAuthenticationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final IUserFeignRepository userFeignRepository;
 
     private final VerifyAuthenticationUtil verifyAuthenticationUtil;
+    private final RabbitTemplate rabbitTemplate;
+    private final MailConstructor mailConstructor;
 
     /**
      * Returns a Data Transfer Object for a transaction created successfully
@@ -68,7 +72,9 @@ public class TransactionServiceImpl implements TransactionService {
             BeanUtils.copyProperties(repository.save(toSave), response);
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
+            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageAddMoney(account,toSave));
             accountRepository.save(account);
+
             return response;
         }
         throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " +
@@ -110,6 +116,8 @@ public class TransactionServiceImpl implements TransactionService {
             //setting new values to available amount to accounts in transaction
             account.setAvailable_amount(account.getAvailable_amount().subtract(response.getTransactionAmount()));
             accountRecipient.setAvailable_amount(accountRecipient.getAvailable_amount().add(response.getTransactionAmount()));
+            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageTransferMoney(account,
+                    accountRecipient,toSave));
             accountRepository.save(account);
             accountRepository.save(accountRecipient);
             return response;
