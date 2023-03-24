@@ -14,10 +14,10 @@ import com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.usersservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.usersservice.util.MailConstructor;
+import com.digitalhouse.money.usersservice.util.VerifyAuthenticationUtil;
 import jakarta.inject.Inject;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -36,16 +36,18 @@ public class UserServiceImpl implements UserService {
 
     private final IAccountFeignRepository accountRepository;
 
+    private final VerifyAuthenticationUtil verifyAuthenticationUtil;
     private final RabbitTemplate rabbitTemplate;
     private final MailConstructor mailConstructor;
 
     @Inject
     public UserServiceImpl(IUserKeycloakRepository iUserKeycloak, UserRepository userRepository,
-                           IAccountFeignRepository accountRepository, MailConstructor mailConstructor,
+                           IAccountFeignRepository accountRepository, VerifyAuthenticationUtil verifyAuthenticationUtil, MailConstructor mailConstructor,
                            RabbitTemplate rabbitTemplate) {
         this.iUserKeycloak = iUserKeycloak;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
+        this.verifyAuthenticationUtil = verifyAuthenticationUtil;
         this.mailConstructor = mailConstructor;
         this.rabbitTemplate = rabbitTemplate;
     }
@@ -95,7 +97,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getUserByUUID(UUID uuid) throws ResourceNotFoundException, UnauthorizedException {
         User fromKeycloak = iUserKeycloak.findUserByUUID(uuid);
-        if (!isUserUUIDSameFromAuth(uuid))
+        if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(uuid))
             throw new UnauthorizedException("User not authorized to perform this request");
         if (userRepository.existsById(uuid) && fromKeycloak != null) {
             UserResponse response = new UserResponse();
@@ -113,7 +115,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(UUID userUUID, UpdateUserRequestBody user) {
         Optional<User> fromDb;
         fromDb = userRepository.findById(userUUID);
-        if (!isUserUUIDSameFromAuth(userUUID))
+        if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(userUUID))
             throw new UnauthorizedException("User not authorized to perform this request");
         if (userRepository.existsById(userUUID) && fromDb.isPresent()) {
             UUID accountNumber = fromDb.get().getAccountNumber();
@@ -184,18 +186,5 @@ public class UserServiceImpl implements UserService {
                         .lastName(user.getLastName())
                         .email(user.getEmail())
                         .build()));
-    }
-
-
-    private boolean isUserUUIDSameFromAuth(UUID requested) {
-        UUID fromAuthContext = UUID.fromString(
-                SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getName()
-        );
-        //if service is requesting this info is a back-end client return is true
-        if (fromAuthContext.equals(UUID.fromString("75791a12-a3ec-497a-b426-0888fc83ba6a")))
-            return true;
-        return fromAuthContext.equals(requested);
     }
 }
