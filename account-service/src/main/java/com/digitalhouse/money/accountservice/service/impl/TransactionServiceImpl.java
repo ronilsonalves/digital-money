@@ -5,7 +5,10 @@ import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.data.model.Account;
 import com.digitalhouse.money.accountservice.data.model.Card;
 import com.digitalhouse.money.accountservice.data.model.Transaction;
-import com.digitalhouse.money.accountservice.data.repository.*;
+import com.digitalhouse.money.accountservice.data.repository.AccountRepository;
+import com.digitalhouse.money.accountservice.data.repository.CardRepository;
+import com.digitalhouse.money.accountservice.data.repository.IUserFeignRepository;
+import com.digitalhouse.money.accountservice.data.repository.TransactionRepository;
 import com.digitalhouse.money.accountservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.accountservice.exceptionhandler.InsufficientFundsException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
@@ -72,13 +75,12 @@ public class TransactionServiceImpl implements TransactionService {
             BeanUtils.copyProperties(repository.save(toSave), response);
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
-            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageAddMoney(account,toSave));
             accountRepository.save(account);
-
+            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageAddMoney(account,toSave));
             return response;
         }
         throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " +
-                "money in our wallet, soon new methods will be available.");
+                "money into your wallet, soon new methods will be available.");
     }
 
     /**
@@ -116,10 +118,10 @@ public class TransactionServiceImpl implements TransactionService {
             //setting new values to available amount to accounts in transaction
             account.setAvailable_amount(account.getAvailable_amount().subtract(response.getTransactionAmount()));
             accountRecipient.setAvailable_amount(accountRecipient.getAvailable_amount().add(response.getTransactionAmount()));
-            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageTransferMoney(account,
-                    accountRecipient,toSave));
             accountRepository.save(account);
             accountRepository.save(accountRecipient);
+            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageTransferMoney(account,
+                    accountRecipient,toSave));
             return response;
         }
         throw new BadRequestException("Invalid fields, please verify the transfer data and try again.");

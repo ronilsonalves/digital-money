@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.UUID;
@@ -34,7 +35,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class KeycloakRepository implements IUserKeycloakRepository {
 
-    private static Logger log = Logger.getLogger(KeycloakRepository.class.getName());
+    private static final Logger log = Logger.getLogger(KeycloakRepository.class.getName());
 
     private final Keycloak keycloak;
 
@@ -56,7 +57,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     private String usersInfoEndpoint;
 
     @Override
-    public User findUserByUUID(UUID uuid) throws NotFoundException{
+    public User findUserByUUID(UUID uuid) throws NotFoundException, ProcessingException {
         try {
             UserResource userResource = keycloak
                     .realm(realm)
@@ -66,6 +67,9 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             return fromRepresentation(userRepresentation);
         } catch (NotFoundException e) {
             throw new ResourceNotFoundException("There's no user with data provided registered");
+        } catch (ProcessingException e) {
+            log.warning("Con. Error: "+e.getMessage());
+            return findUserByUUID(uuid);
         }
     }
 
