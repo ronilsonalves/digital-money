@@ -31,7 +31,7 @@ public class TransactionsRouteTest {
                 + "\"cardIdentification\": \"eec716a2-9a1c-4603-8e44-3dd907990721\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
-                + "\"transactionDate\": \"2023-03-21\","
+                + "\"transactionDate\": \"2023-03-24\","
                 + "\"transactionType\": \"DEPÓSITO\","
                 + "\"description\": \"Segue 100\""
                 + "}";

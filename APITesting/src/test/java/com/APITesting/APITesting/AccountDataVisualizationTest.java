@@ -23,7 +23,7 @@ public class AccountDataVisualizationTest {
         Response response = request.body(jsonBody).post("/auth/login");
         String bearerToken = response.getBody().jsonPath().getString("token");
         String accessToken = bearerToken.replace("Bearer ", "");
-        String account_id = "f81f973b-a3b1-47c0-a3cf-1b77d4bc2ee1";
+        String account_id = "b0f82bff-5f5a-422d-84bd-65f94ea6ba53";
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.header("Authorization", "Bearer " + accessToken);
