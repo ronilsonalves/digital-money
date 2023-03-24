@@ -30,7 +30,7 @@ public class TransfersRouteTest {
                 + "\"originAccountNumber\": \"a8ccd122-5159-4435-9430-d81ec53f7089\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
-                + "\"transactionDate\": \"2023-03-21\","
+                + "\"transactionDate\": \"2023-03-24\","
                 + "\"transactionType\": \"TRANSFERÊNCIA\","
                 + "\"description\": \"Segue 100\""
                 + "}";
@@ -179,12 +179,12 @@ public class TransfersRouteTest {
         Response response = request.body(jsonBody).post("/auth/login");
         String bearerToken = response.getBody().jsonPath().getString("token");
         String accessToken = bearerToken.replace("Bearer ", "");
-        String account_id = "f81f973b-a3b1-47c0-a3cf-1b77d4bc2ee1";
+        String account_id = "b0f82bff-5f5a-422d-84bd-65f94ea6ba53";
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
         String jsonBody2 = "{"
-                + "\"originAccountNumber\": \"f81f973b-a3b1-47c0-a3cf-1b77d4bc2ee1\","
+                + "\"originAccountNumber\": \"b0f82bff-5f5a-422d-84bd-65f94ea6ba53\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
                 + "\"transactionDate\": \"2023-03-21\","
