@@ -49,6 +49,13 @@ public class User implements Serializable {
     @Size(min = 10, max = 15)
     private String phone;
 
+    @Column(unique = true)
+    private UUID accountNumber;
+
+    @Size(min = 6,max = 6)
+    @Column(unique = true)
+    private String emailVerificationCode;
+
     public User(String id) {
         this.Id = UUID.fromString(id);
     }

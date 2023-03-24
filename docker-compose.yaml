@@ -21,9 +21,11 @@ services:
       - postgres
     container_name: keycloak
     image: quay.io/keycloak/keycloak:20.0.2-1
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import
     ports:
       - '8070:8080'
-    command: "start-dev"
+    command: "start-dev --import-realm"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: 'S373Y91YQuf'
@@ -49,6 +51,21 @@ services:
       - db-mysql:/var/lib/mysql
     networks:
       - rede_digitalmoney
+  db_account_service:
+    container_name: db_account
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: 'account-service'
+      MYSQL_USER: 'account-service'
+      MYSQL_PASSWORD: 'account-service'
+      MYSQL_ROOT_PASSWORD: 'strongest-password'
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-mysql-account:/var/lib/mysql
+    networks:
+      - rede_digitalmoney
 
 networks:
   rede_digitalmoney:
@@ -56,3 +73,4 @@ networks:
 volumes:
   db:
   db-mysql:
+  db-mysql-account:

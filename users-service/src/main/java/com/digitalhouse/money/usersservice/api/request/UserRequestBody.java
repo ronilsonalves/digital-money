@@ -1,15 +1,13 @@
 package com.digitalhouse.money.usersservice.api.request;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
+@ToString
 public class UserRequestBody {
 
     @NotBlank

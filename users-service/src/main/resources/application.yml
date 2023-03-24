@@ -1,11 +1,11 @@
 digitalmoney:
   keycloak:
     realm: digitalmoney
-    serverUrl: http://localhost:8070/
-    clientId: backend
-    clientSecret: cKiJPsLJvkKdOEfSpvbpMmkHKcfwGthY
-    clientIdUsers: users-service
-    clientSecretUsers: KOqlRonu7wFZKi08JxREu3rHMacuDOFE
+    serverUrl: ${KEYCLOAK_SERVER_URL}
+    clientId: ${CLIENT_ID_BACKEND}
+    clientSecret: ${CLIENT_SECRET_BACKEND}
+    clientIdUsers: ${CLIENT_ID_USERS}
+    clientSecretUsers: ${CLIENT_SECRET_USERS}
     usersInfoEndpoint: "${digitalmoney.keycloak.serverUrl}/realms/${digitalmoney.keycloak.realm}/protocol/openid-connect/userinfo"
 
 spring:
@@ -13,9 +13,9 @@ spring:
     name: users-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/users-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
-    username: users-service
-    password: users-service
+    url: jdbc:mysql://${USR_SVC_DB_URL}:3306/users-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: ${USR_SVC_DB_USER}
+    password: ${USR_SVC_DB_PASS}
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,16 +29,22 @@ spring:
         registration:
           keycloak-registration:
             provider: keycloak-provider
-            client-id: backend
+            client-id: ${CLIENT_ID_BACKEND}
             authorization-grant-type: client_credentials
-            client-secret: cKiJPsLJvkKdOEfSpvbpMmkHKcfwGthY
+            client-secret: ${CLIENT_SECRET_BACKEND}
         provider:
           keycloak-provider:
-            token-uri: http://localhost:8070/realms/digitalmoney/protocol/openid-connect/token
+            token-uri: ${REALM_TOKEN_URI}
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8070/realms/digitalmoney
+          issuer-uri: ${JWT_ISSUER_URI}
 
+  rabbitmq:
+    host: jackal.rmq.cloudamqp.com
+    port: 5672
+    username: rzchwbxv
+    password: O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD
+    virtual-host: rzchwbxv
 server:
   port: 8081
 
@@ -46,7 +52,7 @@ info:
   app:
     name: ${spring.application.name}
     version: 0.0.1
-    decription: Users service
+    description: Users service
   svc:
     port: ${server.port}
 

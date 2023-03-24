@@ -25,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 import java.util.Collections;
 import java.util.UUID;
@@ -34,7 +35,7 @@ import java.util.logging.Logger;
 @RequiredArgsConstructor
 public class KeycloakRepository implements IUserKeycloakRepository {
 
-    private static Logger log = Logger.getLogger(KeycloakRepository.class.getName());
+    private static final Logger log = Logger.getLogger(KeycloakRepository.class.getName());
 
     private final Keycloak keycloak;
 
@@ -49,11 +50,14 @@ public class KeycloakRepository implements IUserKeycloakRepository {
     @Value("${digitalmoney.keycloak.clientSecretUsers}")
     private String clientSecret;
 
+    @Value("${KEYCLOAK_SERVER_URL}")
+    private String keycloakServerURL;
+
     @Value("${digitalmoney.keycloak.usersInfoEndpoint}")
     private String usersInfoEndpoint;
 
     @Override
-    public User findUserByUUID(UUID uuid) throws NotFoundException{
+    public User findUserByUUID(UUID uuid) throws NotFoundException, ProcessingException {
         try {
             UserResource userResource = keycloak
                     .realm(realm)
@@ -63,6 +67,9 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             return fromRepresentation(userRepresentation);
         } catch (NotFoundException e) {
             throw new ResourceNotFoundException("There's no user with data provided registered");
+        } catch (ProcessingException e) {
+            log.warning("Con. Error: "+e.getMessage());
+            return findUserByUUID(uuid);
         }
     }
 
@@ -75,7 +82,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             CredentialRepresentation passwordCred = new CredentialRepresentation();
             String userId = CreatedResponseUtil.getCreatedId(userResponse);
             passwordCred.setTemporary(false);
-            passwordCred.setType("password");
+            passwordCred.setType(CredentialRepresentation.PASSWORD);
             passwordCred.setValue(user.getPassword());
             UserResource userResource = keycloak.realm(realm).users().get(userId);
             userResource.resetPassword(passwordCred);
@@ -87,6 +94,48 @@ public class KeycloakRepository implements IUserKeycloakRepository {
             log.info(e.getMessage());
             throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException(
                     "Please, verify the provided data for fields on RequestBody and try again.");
+        }
+    }
+
+    /**
+     * Perform an update from Keycloak user's information Keycloak.
+     * @param userID provided at request
+     * @param user provided at request
+     * @return User updated
+     * @throws com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException if for any reason the fields
+     * are invalid
+     * @throws ResourceNotFoundException if a non-existent UUID is provided
+     */
+    public User updateUser(UUID userID,UserRequestBody user) {
+        try {
+            UserResource resource = keycloak.realm(realm).users().get(String.valueOf(userID));
+            UserRepresentation representation = new UserRepresentation();
+            if (user.getPassword() != null) {
+                CredentialRepresentation passwordCred = new CredentialRepresentation();
+                passwordCred.setTemporary(false);
+                passwordCred.setType(CredentialRepresentation.PASSWORD);
+                passwordCred.setValue(user.getPassword().trim());
+                representation.setCredentials(Collections.singletonList(passwordCred));
+            }
+            representation.setFirstName(user.getName());
+            representation.setLastName(user.getLastName());
+            if (user.getEmail() != null) {
+                representation.setEmail(user.getEmail());
+                representation.setEnabled(false);
+                representation.setEmailVerified(true);
+            }
+            resource.update(representation);
+            return findUserByUUID(userID);
+        } catch (BadRequestException e) {
+            log.warning("Exception: "+e);
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException(
+                    "An error occurred while trying to update user, please check the fields and try again."
+            );
+        } catch (NotFoundException e) {
+            log.warning("Not Found: "+e);
+            throw new ResourceNotFoundException(
+                    "There's no user registered in Keycloak with provided UUID."
+            );
         }
     }
 
@@ -134,9 +183,29 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         }
     }
 
+    /**
+     * Validate a user passing a valid UserId
+     * @param userID provided at user's service request
+     */
+    public void verifyEmailAddress(UUID userID) {
+        try {
+            UserResource resource = keycloak.realm(realm).users().get(String.valueOf(userID));
+            UserRepresentation representation = resource.toRepresentation();
+            representation.setEmailVerified(true);
+            representation.setEnabled(true);
+            resource.update(representation);
+        } catch (NotFoundException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException("Unable to " +
+                    "validate email address, user not found!");
+        }catch (BadRequestException e) {
+            throw new com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException("An error occurred " +
+                    "while trying to perform your request, try again later and if error persists contact support. ");
+        }
+    }
+
     public Object login(UserLoginRequestBody userLoginRequestBody) {
         try {
-            Keycloak keycloak1 = Keycloak.getInstance("http://localhost:8070/",realm,
+            Keycloak keycloak1 = Keycloak.getInstance(keycloakServerURL,realm,
                     userLoginRequestBody.getEmail(), userLoginRequestBody.getPassword(),clientId,
                     clientSecret,null,null,false,null,"openid");
 
@@ -160,7 +229,7 @@ public class KeycloakRepository implements IUserKeycloakRepository {
         userRepresentation.setFirstName(user.getName());
         userRepresentation.setLastName(user.getLastName());
         userRepresentation.setEmail(user.getEmail());
-        userRepresentation.setEnabled(true);
+        userRepresentation.setEnabled(false);
         return userRepresentation;
     }
 

@@ -1,0 +1,85 @@
+version: '3.9'
+services:
+
+  postgres_sec:
+    container_name: keycloak_db_sec
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "S373Y91YQuf"
+    ports:
+      - "5435:5432"
+    networks:
+      - rede_digitalmoney
+    volumes:
+      - db-sec:/var/lib/postgresql/data
+
+  keycloak_sec_service:
+    depends_on:
+      - postgres_sec
+    container_name: keycloak_sec
+    image: quay.io/keycloak/keycloak:20.0.2-1
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import
+      - ./keycloak/certs/:/etc/x509/https
+    ports:
+      - "8070:8080"
+      - "443:8443"
+    command: "-v start --https-protocols=TLSv1.3,TLSv1.2 --import-realm"
+    environment:
+      KC_HEALTH_ENABLED: true
+      KC_HOSTNAME: auth.pi.ronilsonalves.com
+      KC_HTTPS_CERTIFICATE_FILE: /etc/x509/https/cert.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /etc/x509/https/privkey.pem
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_PROXY: edge
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: 'S373Y91YQuf'
+      KC_DB: postgres
+      KC_DB_PASSWORD: 'S373Y91YQuf'
+      KC_DB_USERNAME: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db_sec:5432/keycloak
+    networks:
+      - rede_digitalmoney
+
+  db_service:
+    container_name: db_users
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: 'users-service'
+      MYSQL_USER: 'users-service'
+      MYSQL_PASSWORD: 'users-service'
+      MYSQL_ROOT_PASSWORD: 'strongest-password'
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-mysql:/var/lib/mysql
+    networks:
+      - rede_digitalmoney
+  db_account_service:
+    container_name: db_account
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: 'account-service'
+      MYSQL_USER: 'account-service'
+      MYSQL_PASSWORD: 'account-service'
+      MYSQL_ROOT_PASSWORD: 'strongest-password'
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-mysql-account:/var/lib/mysql
+    networks:
+      - rede_digitalmoney
+
+networks:
+  rede_digitalmoney:
+    driver: bridge
+volumes:
+  db:
+  db-sec:
+  db-mysql:
+  db-mysql-account:

@@ -1,0 +1,100 @@
+spring:
+  application:
+    name: account-service
+
+  datasource:
+    url: jdbc:mysql://${ACC_SVC_DB_URL}/account-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
+    username: ${ACC_SVC_DB_USER}
+    password: ${ACC_SVC_DB_PASS}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    generate-ddl: true
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak-registration:
+            provider: keycloak-provider
+            client-id: ${CLIENT_ID_BACKEND}
+            authorization-grant-type: client_credentials
+            client-secret: ${CLIENT_SECRET_BACKEND}
+        provider:
+          keycloak-provider:
+            token-uri: ${REALM_TOKEN_URI}
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI}
+
+  rabbitmq:
+    host: jackal.rmq.cloudamqp.com
+    port: 5672
+    username: rzchwbxv
+    password: O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD
+    virtual-host: rzchwbxv
+
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      userCircuitBreaker:
+#        allowHealthIndicatorToFail: false
+#        registerHealthIndicator: true
+#        slidingWindowType: COUNT_BASED
+#        slidingWindowSize: 5
+#        failure-rate-threshold: 50
+#        waitDurationInOpenState: 50s
+#        permitted-number-of-calls-in-half-open-state: 3
+#        automatic-transition-from-open-to-half-open-enabled: true
+#  retry:
+#    instances:
+#      userCircuitBreaker:
+#        maxAttempts: 3
+#        waitDuration: 10s
+#
+#        retryExceptions:
+#          - feign.FeignException.InternalServerError
+#          - org.springframework.web.client.HttpServerErrorException
+#          - java.util.concurrent.TimeoutException
+#          - java.io.IOException
+
+server:
+  port: 8082
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: 0.0.1
+    description: Account's service
+  svc:
+    port: ${server.port}
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+digitalmoney:
+  keycloak:
+    realm: digitalmoney
+    serverUrl: ${KEYCLOAK_SERVER_URL}
+    clientId: ${CLIENT_ID_BACKEND}
+    clientSecret: ${CLIENT_SECRET_BACKEND}
+    usersInfoEndpoint: "${digitalmoney.keycloak.serverUrl}/realms/${digitalmoney.keycloak.realm}/protocol/openid-connect/userinfo"
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.http: DEBUG
+    org.springdoc: WARN
+
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: ${CLIENT_ID_BACKEND}
+      client-secret: ${CLIENT_SECRET_BACKEND}

@@ -10,6 +10,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 @ConfigurationProperties(prefix = "keycloak")
 public class KeycloakClientConfig {
@@ -34,7 +36,8 @@ public class KeycloakClientConfig {
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .resteasyClient(resteasyClientBuilder.connectionPoolSize(10).build())
+                .resteasyClient(resteasyClientBuilder.connectionPoolSize(10)
+                        .connectTimeout(6000, TimeUnit.MILLISECONDS).build())
                 .build();
     }
 }

@@ -1,15 +1,22 @@
 package com.digitalhouse.money.usersservice.api.controller;
 
+import com.digitalhouse.money.usersservice.api.request.UpdateUserRequestBody;
 import com.digitalhouse.money.usersservice.api.request.UserRequestBody;
 import com.digitalhouse.money.usersservice.api.request.UserResetPasswordRequest;
+import com.digitalhouse.money.usersservice.api.request.UserVerificationCodeRequestBody;
+import com.digitalhouse.money.usersservice.api.response.UserResponse;
 import com.digitalhouse.money.usersservice.api.service.UserService;
-import com.digitalhouse.money.usersservice.data.model.User;
 import com.digitalhouse.money.usersservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.usersservice.exceptionhandler.ResourceNotFoundException;
+import com.digitalhouse.money.usersservice.exceptionhandler.ServerException;
+import com.digitalhouse.money.usersservice.exceptionhandler.UnauthorizedException;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -31,7 +38,7 @@ public class UserController {
      * userRequestBody payload.
      */
     @PostMapping("/register")
-    public ResponseEntity<User> createUser(@RequestBody UserRequestBody userRequestBody) throws BadRequestException {
+    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequestBody userRequestBody) throws BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userRequestBody));
     }
 
@@ -51,7 +58,32 @@ public class UserController {
     }
 
     @GetMapping("/{userUUID}")
-    public ResponseEntity<User> getUserByUUID(@PathVariable UUID userUUID) throws ResourceNotFoundException {
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> getUserByUUID(@PathVariable UUID userUUID) throws ResourceNotFoundException,
+            ServerException,
+            UnauthorizedException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByUUID(userUUID));
+    }
+
+    @PostMapping("/send-verification")
+    public ResponseEntity<?> resendVerificationCode(@RequestBody UserResetPasswordRequest userEmail) throws ResourceNotFoundException {
+        userService.resendEmailVerifyCode(userEmail.getEmailAddress());
+        return ResponseEntity.status(HttpStatus.OK).body("An email message was sent to user with a new verification " +
+                "code. Please follow instructions to validate your email address and activate your account!");
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestBody UserVerificationCodeRequestBody code) throws BadRequestException {
+        userService.verifyEmail(code.getCode());
+        return ResponseEntity.status(HttpStatus.OK).body("Your email and account are validated!");
+    }
+
+
+    @PatchMapping("/{userUUID}")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> updateUserByUUID(@PathVariable UUID userUUID, @Valid @RequestBody UpdateUserRequestBody user) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userUUID, user));
     }
 }
