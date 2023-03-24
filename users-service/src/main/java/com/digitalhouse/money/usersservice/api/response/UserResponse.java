@@ -1,14 +1,12 @@
 package com.digitalhouse.money.usersservice.api.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
@@ -18,5 +16,5 @@ public class UserResponse {
     private String cpf;
     private String email;
     private String phone;
-    private Account account;
+    private UUID accountNumber;
 }

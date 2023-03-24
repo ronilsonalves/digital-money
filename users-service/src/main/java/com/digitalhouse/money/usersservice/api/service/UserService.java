@@ -13,7 +13,11 @@ public interface UserService {
 
     void resetPassword(String userEmailAddress);
 
+    void resendEmailVerifyCode(String userEmailAddress);
+
     UserResponse getUserByUUID(UUID uuid) throws UnauthorizedException;
 
     UserResponse updateUser(UUID userUUID, UpdateUserRequestBody user);
+
+    void verifyEmail(String verificationCode);
 }

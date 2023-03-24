@@ -52,4 +52,14 @@ public class ExceptionControllerAdvice extends ResponseEntityExceptionHandler {
         );
         return new ResponseEntity<>(error,HttpStatus.UNAUTHORIZED);
     }
+
+    @ResponseBody
+    @ExceptionHandler(ServerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<MessageExceptionHandler> serverException (ServerException serverException) {
+        MessageExceptionHandler error = new MessageExceptionHandler(
+                LocalDateTime.now(),HttpStatus.INTERNAL_SERVER_ERROR.value(), serverException.getMessage()
+        );
+        return new ResponseEntity<>(error,HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

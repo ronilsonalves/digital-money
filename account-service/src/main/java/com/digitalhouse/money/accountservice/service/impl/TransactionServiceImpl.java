@@ -5,14 +5,19 @@ import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.data.model.Account;
 import com.digitalhouse.money.accountservice.data.model.Card;
 import com.digitalhouse.money.accountservice.data.model.Transaction;
-import com.digitalhouse.money.accountservice.data.repository.*;
+import com.digitalhouse.money.accountservice.data.repository.AccountRepository;
+import com.digitalhouse.money.accountservice.data.repository.CardRepository;
+import com.digitalhouse.money.accountservice.data.repository.IUserFeignRepository;
+import com.digitalhouse.money.accountservice.data.repository.TransactionRepository;
 import com.digitalhouse.money.accountservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.accountservice.exceptionhandler.InsufficientFundsException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.service.TransactionService;
+import com.digitalhouse.money.accountservice.util.MailConstructor;
 import com.digitalhouse.money.accountservice.util.VerifyAuthenticationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final IUserFeignRepository userFeignRepository;
 
     private final VerifyAuthenticationUtil verifyAuthenticationUtil;
+    private final RabbitTemplate rabbitTemplate;
+    private final MailConstructor mailConstructor;
 
     /**
      * Returns a Data Transfer Object for a transaction created successfully
@@ -69,10 +76,11 @@ public class TransactionServiceImpl implements TransactionService {
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
             accountRepository.save(account);
+            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageAddMoney(account,toSave));
             return response;
         }
         throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " +
-                "money in our wallet, soon new methods will be available.");
+                "money into your wallet, soon new methods will be available.");
     }
 
     /**
@@ -112,6 +120,8 @@ public class TransactionServiceImpl implements TransactionService {
             accountRecipient.setAvailable_amount(accountRecipient.getAvailable_amount().add(response.getTransactionAmount()));
             accountRepository.save(account);
             accountRepository.save(accountRecipient);
+            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageTransferMoney(account,
+                    accountRecipient,toSave));
             return response;
         }
         throw new BadRequestException("Invalid fields, please verify the transfer data and try again.");

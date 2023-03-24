@@ -6,6 +6,7 @@ spring:
     url: jdbc:mysql://${ACC_SVC_DB_URL}/account-service?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&serverTimezone=UTC-3&useSSL=false
     username: ${ACC_SVC_DB_USER}
     password: ${ACC_SVC_DB_PASS}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -28,6 +29,37 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${JWT_ISSUER_URI}
+
+  rabbitmq:
+    host: jackal.rmq.cloudamqp.com
+    port: 5672
+    username: rzchwbxv
+    password: O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD
+    virtual-host: rzchwbxv
+
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      userCircuitBreaker:
+#        allowHealthIndicatorToFail: false
+#        registerHealthIndicator: true
+#        slidingWindowType: COUNT_BASED
+#        slidingWindowSize: 5
+#        failure-rate-threshold: 50
+#        waitDurationInOpenState: 50s
+#        permitted-number-of-calls-in-half-open-state: 3
+#        automatic-transition-from-open-to-half-open-enabled: true
+#  retry:
+#    instances:
+#      userCircuitBreaker:
+#        maxAttempts: 3
+#        waitDuration: 10s
+#
+#        retryExceptions:
+#          - feign.FeignException.InternalServerError
+#          - org.springframework.web.client.HttpServerErrorException
+#          - java.util.concurrent.TimeoutException
+#          - java.io.IOException
 
 server:
   port: 8082
