@@ -52,6 +52,10 @@ public class User implements Serializable {
     @Column(unique = true)
     private UUID accountNumber;
 
+    @Size(min = 6,max = 6)
+    @Column(unique = true)
+    private String emailVerificationCode;
+
     public User(String id) {
         this.Id = UUID.fromString(id);
     }
