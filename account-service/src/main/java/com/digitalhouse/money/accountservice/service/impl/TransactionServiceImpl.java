@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,11 +51,9 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransactionResponseDTO save(TransactionRequestDTO transactionData, UUID accountId) throws ResourceNotFoundException {
-        Account account = accountRepository.findById(accountId).orElseThrow(() ->
-                new ResourceNotFoundException("There's no account with number provided."));
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There's no account with number provided."));
 
-        Card card = cardRepository.findById(transactionData.getCardIdentification()).orElseThrow(() ->
-                new ResourceNotFoundException("There's no card with ID provided."));
+        Card card = cardRepository.findById(transactionData.getCardIdentification()).orElseThrow(() -> new ResourceNotFoundException("There's no card with ID provided."));
 
         if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()) || !account.getId().equals(card.getAccountId()))
             throw new UnauthorizedException("User not authorized to perform this action.");
@@ -70,17 +67,15 @@ public class TransactionServiceImpl implements TransactionService {
             transactionData.setRecipientAccountNumber(accountId);
             transactionData.setTransactionDate(LocalDate.now());
             BeanUtils.copyProperties(transactionData, toSave);
-            toSave.setCardEnding(cardRepository.findById(toSave.getCardIdentification())
-                    .get().getNumber().toString().substring(12));
+            toSave.setCardEnding(cardRepository.findById(toSave.getCardIdentification()).get().getNumber().toString().substring(12));
             BeanUtils.copyProperties(repository.save(toSave), response);
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
             accountRepository.save(account);
-            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageAddMoney(account,toSave));
+            rabbitTemplate.convertAndSend("mail-service", mailConstructor.getMailMessageAddMoney(account, toSave));
             return response;
         }
-        throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " +
-                "money into your wallet, soon new methods will be available.");
+        throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " + "money into your wallet, soon new methods will be available.");
     }
 
     /**
@@ -95,12 +90,8 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public TransferResponseDTO save(TransferRequestDTO transferData, UUID accountId) throws ResourceNotFoundException {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There" +
-                "'s no account registered with number provided."));
-        Account accountRecipient =
-                accountRepository.findById(transferData.getRecipientAccountNumber()).orElseThrow(() ->
-                        new ResourceNotFoundException("Invalid account destination. Please verify the destination " +
-                                "number and try again"));
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There" + "'s no account registered with number provided."));
+        Account accountRecipient = accountRepository.findById(transferData.getRecipientAccountNumber()).orElseThrow(() -> new ResourceNotFoundException("Invalid account destination. Please verify the destination " + "number and try again"));
 
         if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()))
             throw new UnauthorizedException("User not authorized");
@@ -111,8 +102,7 @@ public class TransactionServiceImpl implements TransactionService {
             Transaction toSave = new Transaction();
             TransferResponseDTO response = new TransferResponseDTO();
             if (transferData.getTransactionAmount().compareTo(account.getAvailable_amount()) >= 0)
-                throw new InsufficientFundsException("Unable to complete transfer. Account with insufficient funds to" +
-                        " complete the transaction");
+                throw new InsufficientFundsException("Unable to complete transfer. Account with insufficient funds to" + " complete the transaction");
             BeanUtils.copyProperties(transferData, toSave);
             BeanUtils.copyProperties(repository.save(toSave), response);
             //setting new values to available amount to accounts in transaction
@@ -120,8 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
             accountRecipient.setAvailable_amount(accountRecipient.getAvailable_amount().add(response.getTransactionAmount()));
             accountRepository.save(account);
             accountRepository.save(accountRecipient);
-            rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageTransferMoney(account,
-                    accountRecipient,toSave));
+            rabbitTemplate.convertAndSend("mail-service", mailConstructor.getMailMessageTransferMoney(account, accountRecipient, toSave));
             return response;
         }
         throw new BadRequestException("Invalid fields, please verify the transfer data and try again.");
@@ -136,7 +125,7 @@ public class TransactionServiceImpl implements TransactionService {
      */
     @Override
     public List<TransactionResponseDTO> listAllTransactionsByAccount(UUID accountId) throws ResourceNotFoundException {
-        return repository.findAllByOriginAccountNumber(accountId).stream().map(this::createResponse).collect(Collectors.toList());
+        return repository.findAllByOriginAccountNumber(accountId).stream().map(this::createResponse).toList();
     }
 
     /**
@@ -151,73 +140,62 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws UnauthorizedException     when user try to fetch data from another account that's not his.
      */
     @Override
-    public Page<ITransferResponseDTO> listAllByAccountOriginAndTypeOrdByDate(UUID origin,
-                                                                             TransactionType type,
-                                                                             Pageable pageable)
-            throws BadRequestException,
-            ResourceNotFoundException,
-            UnauthorizedException {
-        Account account = accountRepository.findById(origin).orElseThrow(() -> new ResourceNotFoundException("There" +
-                "´s no account registered with identification provided"));
+    public Page<ITransferResponseDTO> listAllByAccountOriginAndTypeOrdByDate(UUID origin, TransactionType type, Pageable pageable) throws BadRequestException, ResourceNotFoundException, UnauthorizedException {
+        Account account = accountRepository.findById(origin).orElseThrow(() -> new ResourceNotFoundException("There" + "´s no account registered with identification provided"));
 
         if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()))
             throw new UnauthorizedException("User is not authorized to perfomr this action.");
 
         if (type != TransactionType.TRANSFERÊNCIA)
-            throw new BadRequestException("Unfortunately you can't make this consult though this endpoint. To consult " +
-                    " your account transactions activities use transactions resource."); //ToDo: add filter to
+            throw new BadRequestException("Unfortunately you can't make this consult though this endpoint. To consult " + " your account transactions activities use transactions resource."); //ToDo: add filter to
         //ToDo: transactions controller limiting up to 5 transactions as activities' endpoint
         return repository.findAllByOriginAccountNumberAndTransactionTypeOrderByTransactionDate(origin, type, pageable);
     }
 
-    @Override
-    public List<TransactionResponseDTO> listLastFiveTransactionsByAccount(UUID accountId) throws ResourceNotFoundException {
-        Sort order = Sort.by(Sort.Direction.DESC, "transactionDate");
-        Example<Transaction> example =
-                Example.of(Transaction.builder().originAccountNumber(accountId).recipientAccountNumber(accountId).build(), ExampleMatcher.matchingAny());
-        Pageable page = PageRequest.of(0,5, order);
-        Page<Transaction> all = repository.findAll(example, page);
-        return all.map(this::createResponse).toList();
-    }
 
     /**
      * Return a list with last five accounts where user transferred money containing with titular´s name, account
      * number and last transaction date.
+     *
      * @param accountId is the origin of transaction, the account of user logged.
      * @return a list with last five accounts where user transferred money containing titular´s name, account number
      * and last transaction date.
      * @throws ResourceNotFoundException if accountId (originAccountNumber) not exists
-     * @throws UnauthorizedException if user is trying to fetch data from another user.
+     * @throws UnauthorizedException     if user is trying to fetch data from another user.
      */
     @Override
     public List<LastFiveTransfersDTO> listLastFiveAccountsTransferred(UUID accountId) throws ResourceNotFoundException, UnauthorizedException {
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There" +
-                "'s no account registered with number provided."));
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There" + "'s no account registered with number provided."));
 
         if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()))
             throw new UnauthorizedException("User not authorized");
 
-        List<ILastFiveTransfers> transactions =
-                repository.findTop5RecipientAccountNumberAndTransactionDateByOriginAccountNumber(accountId,
-               TransactionType.TRANSFERÊNCIA);
+        List<ILastFiveTransfers> transactions = repository.findTop5RecipientAccountNumberAndTransactionDateByOriginAccountNumber(accountId, TransactionType.TRANSFERÊNCIA);
 
         return transactions.stream().map(transaction -> {
-            Account recipient =
-                    accountRepository.findById(transaction.getTransactionDestination()).orElseThrow(() -> new ResourceNotFoundException(
-                            "An error occurred while trying to fetch data from database, please try again. If error " +
-                                    "persists, contact support team."));
+            Account recipient = accountRepository.findById(transaction.getTransactionDestination()).orElseThrow(() -> new ResourceNotFoundException("An error occurred while trying to fetch data from database, please try again. If error " + "persists, contact support team."));
             UserResponse userResponse = userFeignRepository.getUserByUUID(recipient.getUserId());
             LastFiveTransfersDTO response = new LastFiveTransfersDTO();
-            response.setAccountOwner(userResponse.name()+" "+userResponse.lastName());
+            response.setAccountOwner(userResponse.name() + " " + userResponse.lastName());
             response.setTransactionDate(transaction.getTransactionDate());
             response.setRecipientAccountNumber(transaction.getTransactionDestination());
             return response;
-        }).collect(Collectors.toList());
+        }).toList();
+    }
+
+    @Override
+    public Page<TransactionResponseDTO> listActivitiesByAccount(UUID accountId, Pageable pageable, TransactionFilterRequestDTO filter) throws UnauthorizedException {
+
+        if (!verifyAuthenticationUtil.isLoggedUserOwnerOfAccount(accountId))
+            throw new UnauthorizedException("User not authorized");
+
+        return repository.findByAccountIdAndFilter(accountId, filter, pageable).map(this::createResponse);
     }
 
 
     /**
      * Parses a transaction into a response object
+     *
      * @param transaction is a transaction object to be mapped into a DTO
      * @return TransactionResponseDTO.
      */

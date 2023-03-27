@@ -25,7 +25,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account save(Account account) {
-        if(repository.existsByUserId(account.getUserId()))
+        if (repository.existsByUserId(account.getUserId()))
             throw new ConflictException("User already has account");
 
         return repository.save(account);
@@ -33,10 +33,17 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getById(UUID account_id) throws ResourceNotFoundException, UnauthorizedException {
-        Account account = repository.findById(account_id).orElseThrow(()-> new ResourceNotFoundException("Account not" +
+        Account account = repository.findById(account_id).orElseThrow(() -> new ResourceNotFoundException("Account not" +
                 " found."));
         if (!verifyAuthenticationUtil.isUserUUIDSameFromAuth(account.getUserId()))
             throw new UnauthorizedException("User not authorized to perform this action.");
         return account;
+    }
+
+    @Override
+    public Account getByLoggedUser() throws ResourceNotFoundException {
+        UUID loggedUserUUID = verifyAuthenticationUtil.getLoggedUserUUID();
+        return repository.findByUserId(loggedUserUUID).orElseThrow(() -> new ResourceNotFoundException("Account not" +
+                " found."));
     }
 }

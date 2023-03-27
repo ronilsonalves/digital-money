@@ -15,12 +15,13 @@ public interface TransactionService {
 
     /**
      * Returns a Data Transfer Object for a transaction created successfully
+     *
      * @param transactionData a transaction request data
-     * @param accountId the account number to register a transaction as originAccount
+     * @param accountId       the account number to register a transaction as originAccount
      * @return a Data Transfer Object for a transaction created successfully
      * @throws ResourceNotFoundException when accountID
-     * provided not exists.
-     * @throws UnauthorizedException when user try to access data impersonating another user account
+     *                                   provided not exists.
+     * @throws UnauthorizedException     when user try to access data impersonating another user account
      */
     TransactionResponseDTO save(TransactionRequestDTO transactionData, UUID accountId) throws ResourceNotFoundException;
 
@@ -38,6 +39,7 @@ public interface TransactionService {
 
     /**
      * Returns a list of Transactions DTOs by account
+     *
      * @param accountId is used to fetch data of transactions.
      * @return a list of transactions
      * @throws ResourceNotFoundException if the account provided not exists.
@@ -46,13 +48,14 @@ public interface TransactionService {
 
     /**
      * Returns a page of objects containing ITransferResponseDTO
-     * @param origin is the origin account number
-     * @param type of transaction. Default is TransactionType.TRANSFERÊNCIA
+     *
+     * @param origin   is the origin account number
+     * @param type     of transaction. Default is TransactionType.TRANSFERÊNCIA
      * @param pageable an object to interact with JPA Repository to mount the pageable return
      * @return Returns a page of objects containing ITransferResponseDTO
-     * @throws BadRequestException when the type of transactions is different from TransactionType.TRANSFERÊNCIA
+     * @throws BadRequestException       when the type of transactions is different from TransactionType.TRANSFERÊNCIA
      * @throws ResourceNotFoundException when the origin account number is invalid or non-existent.
-     * @throws UnauthorizedException when user try to fetch data from another account that's not his.
+     * @throws UnauthorizedException     when user try to fetch data from another account that's not his.
      */
     Page<ITransferResponseDTO> listAllByAccountOriginAndTypeOrdByDate(UUID origin,
                                                                       TransactionType type,
@@ -61,17 +64,19 @@ public interface TransactionService {
             ResourceNotFoundException,
             UnauthorizedException;
 
-    List<TransactionResponseDTO> listLastFiveTransactionsByAccount(UUID accountId) throws ResourceNotFoundException;
-
     /**
      * Return a list with last five accounts where user transferred money containing with titular´s name, account
      * number and last transaction date.
+     *
      * @param accountId is the origin of transaction, the account of user logged.
      * @return a list with last five accounts where user transferred money containing titular´s name, account number
      * and last transaction date.
      * @throws ResourceNotFoundException if accountId (originAccountNumber) not exists
-     * @throws UnauthorizedException if user is trying to fetch data from another user.
+     * @throws UnauthorizedException     if user is trying to fetch data from another user.
      */
     List<LastFiveTransfersDTO> listLastFiveAccountsTransferred(UUID accountId) throws ResourceNotFoundException, UnauthorizedException;
-};
+
+
+    Page<TransactionResponseDTO> listActivitiesByAccount(UUID accountId, Pageable pageable, TransactionFilterRequestDTO filter);
+}
 
