@@ -3,6 +3,7 @@ package com.digitalhouse.money.accountservice.controller;
 import com.digitalhouse.money.accountservice.data.dto.AccountCreateRequestDTO;
 import com.digitalhouse.money.accountservice.data.model.Account;
 import com.digitalhouse.money.accountservice.exceptionhandler.ConflictException;
+import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.service.AccountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,8 +33,14 @@ public class AccountController {
 
     @GetMapping("accounts/{account_id}")
     @PreAuthorize("isAuthenticated()")
-    public Account getAccountById(@PathVariable UUID account_id){
+    public Account getAccountById(@PathVariable UUID account_id) {
         System.out.println(account_id);
         return service.getById(account_id);
+    }
+
+    @GetMapping("accounts")
+    @PreAuthorize("isAuthenticated()")
+    public Account getMyAccount() throws ResourceNotFoundException {
+        return service.getByLoggedUser();
     }
 }
