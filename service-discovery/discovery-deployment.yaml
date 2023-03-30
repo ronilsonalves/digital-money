@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: eureka
-          image: digitalmoneydev.azurecr.io/service-discovery:develop
+          image: reneralmeida/service-discovery:latest
           ports:
             - name: http
               containerPort: 8761
@@ -30,4 +30,4 @@ spec:
             periodSeconds: 1
           imagePullPolicy: Always
       imagePullSecrets:
-        - name: acr-secret
+        - name: regcred

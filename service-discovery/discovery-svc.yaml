@@ -6,10 +6,9 @@ metadata:
   labels:
     app: eureka
 spec:
+  type: NodePort
   ports:
-    - name: http
-      port: 80
-      targetPort: 8761
+    - port: 8761
+      nodePort: 30030
   selector:
     app: eureka
-  type: ClusterIP

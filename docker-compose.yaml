@@ -1,76 +1,68 @@
 version: '3.9'
 services:
 
-  postgres:
-    container_name: database
-    image: postgres:latest
+#  keycloak:
+#    container_name: keycloak
+#    image: quay.io/keycloak/keycloak:20.0.2-1
+#    volumes:
+#      - ./keycloak/import:/opt/keycloak/data/import
+#    ports:
+#      - '8070:8080'
+#    command: "start-dev --import-realm"
+#    environment:
+#      DB_VENDOR: postgres
+#      DB_ADDR: ${KEYCLOAK_DB_URL}
+#      DB_PORT: ${KEYCLOAK_DB_PORT}
+#      DB_DATABASE: keycloak
+#      DB_USER: ${KEYCLOAK_DB_USER}
+#      DB_PASSWORD: ${KEYCLOAK_DB_PASS}
+#      KEYCLOAK_ADMIN: admin
+#      KEYCLOAK_ADMIN_PASSWORD: 'S373Y91YQuf'
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
+#    networks:
+#      - rede_digitalmoney
+
+  service-discovery:
+    container_name: service-discovery
+    image: reneralmeida/service-discovery
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: keycloak
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "S373Y91YQuf"
     ports:
-      - "5432:5432"
+      - "8761:8761"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - rede_digitalmoney
-    volumes:
-      - db:/var/lib/postgresql/data
 
-  keycloak:
+  users-service:
+    container_name: users-service
+    image: reneralmeida/users-service
+    restart: unless-stopped
     depends_on:
-      - postgres
-    container_name: keycloak
-    image: quay.io/keycloak/keycloak:20.0.2-1
-    volumes:
-      - ./keycloak/import:/opt/keycloak/data/import
+      - service-discovery
+    env_file:
+      - .env
     ports:
-      - '8070:8080'
-    command: "start-dev --import-realm"
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: 'S373Y91YQuf'
-      KC_DB: postgres
-      KC_DB_PASSWORD: 'S373Y91YQuf'
-      KC_DB_USERNAME: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      - ${USR_SVC_PORT}:${USR_SVC_PORT}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - rede_digitalmoney
 
-  db_service:
-    container_name: db_users
-    image: mysql:latest
+  account-service:
+    container_name: account-service
+    image: renerbackend/accounts-service
     restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: 'users-service'
-      MYSQL_USER: 'users-service'
-      MYSQL_PASSWORD: 'users-service'
-      MYSQL_ROOT_PASSWORD: 'strongest-password'
+    depends_on:
+      - service-discovery
+    env_file:
+      - .env
     ports:
-      - "3306:3306"
-    volumes:
-      - db-mysql:/var/lib/mysql
-    networks:
-      - rede_digitalmoney
-  db_account_service:
-    container_name: db_account
-    image: mysql:latest
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: 'account-service'
-      MYSQL_USER: 'account-service'
-      MYSQL_PASSWORD: 'account-service'
-      MYSQL_ROOT_PASSWORD: 'strongest-password'
-    ports:
-      - "3307:3306"
-    volumes:
-      - db-mysql-account:/var/lib/mysql
+      - ${ACC_SVC_PORT}:${ACC_SVC_PORT}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - rede_digitalmoney
 
 networks:
   rede_digitalmoney:
-    driver: bridge
-volumes:
-  db:
-  db-mysql:
-  db-mysql-account:
