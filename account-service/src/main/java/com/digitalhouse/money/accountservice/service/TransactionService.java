@@ -5,6 +5,7 @@ import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
+import com.lowagie.text.DocumentException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,7 +24,7 @@ public interface TransactionService {
      *                                   provided not exists.
      * @throws UnauthorizedException     when user try to access data impersonating another user account
      */
-    TransactionResponseDTO save(TransactionRequestDTO transactionData, UUID accountId) throws ResourceNotFoundException;
+    TransactionResponseDTO save(TransactionRequestDTO transactionData, UUID accountId) throws ResourceNotFoundException, DocumentException;
 
     /**
      * Returns a Data Transfer Object for a transfer made successfully
@@ -35,7 +36,7 @@ public interface TransactionService {
      *                                   provided not exists.
      * @throws UnauthorizedException     when user try to access data impersonating another user account
      */
-    TransferResponseDTO save(TransferRequestDTO transferData, UUID accountId) throws ResourceNotFoundException;
+    TransferResponseDTO save(TransferRequestDTO transferData, UUID accountId) throws ResourceNotFoundException, DocumentException;
 
     /**
      * Returns a list of Transactions DTOs by account
