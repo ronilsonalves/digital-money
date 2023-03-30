@@ -78,5 +78,8 @@ public interface TransactionService {
 
 
     Page<TransactionResponseDTO> listActivitiesByAccount(UUID accountId, Pageable pageable, TransactionFilterRequestDTO filter);
+
+    TransactionResponseDTO getTransactionById(UUID accountId, UUID transactionId)
+            throws ResourceNotFoundException, UnauthorizedException, BadRequestException;
 }
 

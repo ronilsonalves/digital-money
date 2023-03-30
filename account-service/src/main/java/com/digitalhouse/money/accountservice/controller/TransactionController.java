@@ -5,12 +5,14 @@ import com.digitalhouse.money.accountservice.data.dto.TransactionRequestDTO;
 import com.digitalhouse.money.accountservice.data.dto.TransactionResponseDTO;
 import com.digitalhouse.money.accountservice.data.enums.ActivityType;
 import com.digitalhouse.money.accountservice.data.enums.TransactionType;
+import com.digitalhouse.money.accountservice.exceptionhandler.BadRequestException;
 import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundException;
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.response.PageResponse;
 import com.digitalhouse.money.accountservice.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.convert.Delimiter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -103,6 +105,14 @@ public class TransactionController {
                 .totalItems(dtoPage.getTotalElements())
                 .totalPages(dtoPage.getTotalPages())
                 .build();
+    }
+
+    @GetMapping("/accounts/{accountId}/activity/{transactionId}")
+    @ResponseStatus(HttpStatus.OK)
+    public TransactionResponseDTO getTransactionById(@PathVariable @NotNull UUID accountId, @PathVariable @NotNull UUID transactionId)
+            throws UnauthorizedException, ResourceNotFoundException, BadRequestException {
+
+        return service.getTransactionById(accountId, transactionId);
     }
 
 }
