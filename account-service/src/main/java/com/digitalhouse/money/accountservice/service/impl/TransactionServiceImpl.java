@@ -192,6 +192,22 @@ public class TransactionServiceImpl implements TransactionService {
         return repository.findByAccountIdAndFilter(accountId, filter, pageable).map(this::createResponse);
     }
 
+    @Override
+    public TransactionResponseDTO getTransactionById(final UUID accountId, final UUID transactionId)
+            throws ResourceNotFoundException, UnauthorizedException, BadRequestException {
+
+        final Transaction transaction = repository.findById(transactionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
+
+        if (!verifyAuthenticationUtil.isLoggedUserOwnerOfAccount(accountId)
+                || !(transaction.getRecipientAccountNumber().equals(accountId)
+                || transaction.getOriginAccountNumber().equals(accountId))) {
+            throw new UnauthorizedException("User not authorized");
+        }
+
+        return createResponse(transaction);
+    }
+
 
     /**
      * Parses a transaction into a response object
