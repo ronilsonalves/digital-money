@@ -66,7 +66,7 @@ public class CardServiceImpl implements CardService {
                     .number(dto.getNumber())
                     .build());
             rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageAddCard(account,
-                    card.getNumber().toString().substring(12)));
+                    card.getNumber().toString().substring(12),card.getId(),card.getFirstLastName()));
             return card;
         } catch (Exception e) {
             throw new ConflictException(e.getMessage());
@@ -126,6 +126,6 @@ public class CardServiceImpl implements CardService {
 
         repository.deleteById(id);
         rabbitTemplate.convertAndSend("mail-service",mailConstructor.getMailMessageDelCard(account,
-                card.getNumber().toString().substring(12)));
+                card.getNumber().toString().substring(12),card.getId(), card.getFirstLastName()));
     }
 }
