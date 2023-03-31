@@ -16,6 +16,7 @@ import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedExcept
 import com.digitalhouse.money.accountservice.service.TransactionService;
 import com.digitalhouse.money.accountservice.util.MailConstructor;
 import com.digitalhouse.money.accountservice.util.VerifyAuthenticationUtil;
+import com.lowagie.text.DocumentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -50,7 +51,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws UnauthorizedException     when user try to access data impersonating another user account
      */
     @Override
-    public TransactionResponseDTO save(TransactionRequestDTO transactionData, UUID accountId) throws ResourceNotFoundException {
+    public TransactionResponseDTO save(TransactionRequestDTO transactionData, UUID accountId) throws ResourceNotFoundException, DocumentException {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There's no account with number provided."));
 
         Card card = cardRepository.findById(transactionData.getCardIdentification()).orElseThrow(() -> new ResourceNotFoundException("There's no card with ID provided."));
@@ -72,7 +73,8 @@ public class TransactionServiceImpl implements TransactionService {
             //setting a new value to available amount
             account.setAvailable_amount(account.getAvailable_amount().add(response.getTransactionAmount()));
             accountRepository.save(account);
-            rabbitTemplate.convertAndSend("mail-service", mailConstructor.getMailMessageAddMoney(account, toSave));
+            rabbitTemplate.convertAndSend("mail-service", mailConstructor.getMailMessageAddMoney(account, toSave,
+                    card.getFirstLastName()));
             return response;
         }
         throw new BadRequestException("Please verify card used. We're working to expand the ways to you move your " + "money into your wallet, soon new methods will be available.");
@@ -89,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService {
      * @throws UnauthorizedException     when user try to access data impersonating another user account
      */
     @Override
-    public TransferResponseDTO save(TransferRequestDTO transferData, UUID accountId) throws ResourceNotFoundException {
+    public TransferResponseDTO save(TransferRequestDTO transferData, UUID accountId) throws ResourceNotFoundException, DocumentException {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new ResourceNotFoundException("There" + "'s no account registered with number provided."));
         Account accountRecipient = accountRepository.findById(transferData.getRecipientAccountNumber()).orElseThrow(() -> new ResourceNotFoundException("Invalid account destination. Please verify the destination " + "number and try again"));
 
