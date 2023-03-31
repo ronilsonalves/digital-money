@@ -1,6 +1,7 @@
 version: '3.9'
 services:
 
+# Nosso projeto tem a imagem do Keycloak configurada com certificado SSL válido no AKS da Azure graças ao estimado colega Ronilson.
 #  keycloak:
 #    container_name: keycloak
 #    image: quay.io/keycloak/keycloak:20.0.2-1
@@ -25,7 +26,7 @@ services:
 
   service-discovery:
     container_name: service-discovery
-    image: reneralmeida/service-discovery
+    image: registry.gitlab.com/reneralmeida/pi-ii/service-discovery
     restart: unless-stopped
     ports:
       - "8761:8761"
@@ -34,9 +35,24 @@ services:
     networks:
       - rede_digitalmoney
 
+  mail-service:
+    container_name: mail-service
+    image: registry.gitlab.com/reneralmeida/pi-ii/mail-service
+    restart: unless-stopped
+    depends_on:
+      - service-discovery
+    env_file:
+      - .mail-env
+    ports:
+      - "8090:8090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - rede_digitalmoney
+
   users-service:
     container_name: users-service
-    image: reneralmeida/users-service
+    image: registry.gitlab.com/reneralmeida/pi-ii/users-service
     restart: unless-stopped
     depends_on:
       - service-discovery
@@ -51,7 +67,7 @@ services:
 
   account-service:
     container_name: account-service
-    image: renerbackend/accounts-service
+    image: registry.gitlab.com/reneralmeida/pi-ii/accounts-service
     restart: unless-stopped
     depends_on:
       - service-discovery
