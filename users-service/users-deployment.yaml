@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: users
-          image: reneralmeida/users-service:latest
+          image: registry.gitlab.com/reneralmeida/pi-ii/users-service
           ports:
             - name: http
               containerPort: 8081
@@ -51,4 +51,4 @@ spec:
             periodSeconds: 1
           imagePullPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: gitlabcred

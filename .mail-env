@@ -1,8 +1,8 @@
 GIN_MODE=release
-HOST=host.docker.internal
+HOST=localhost
 PORT=8090
 #EurekaServiceDiscovery
-EUREKA_SERVER_URL=http://host.docker.internal:8761/eureka
+EUREKA_SERVER_URL=http://service-discovery:8761/eureka
 #RABBIT_MQ
 RABBIT_MQ_URL_CONN=amqps://rzchwbxv:O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD@jackal.rmq.cloudamqp.com/rzchwbxv
 #OAUTH2_KEYCLOAK

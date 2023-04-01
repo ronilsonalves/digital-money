@@ -16,6 +16,8 @@ ENV CLIENT_ID_USERS=users-service
 ENV KEYCLOAK_SERVER_URL=https://auth.pi.ronilsonalves.com/
 ENV REALM_TOKEN_URI=https://auth.pi.ronilsonalves.com/realms/digitalmoney/protocol/openid-connect/token
 ENV JWT_ISSUER_URI=https://auth.pi.ronilsonalves.com/realms/digitalmoney
+ENV S3_ACCESS_KEY_ID=AKIAV4YTWNKPA6IVRPH6
+ENV JWT_ISSUER_URI=qxveqjjk7EpuNti8QFQiw6Qedw/KDpghoQ95d5iE
 COPY src /home/app/src
 COPY pom.xml /home/app
 RUN mvn -f /home/app/pom.xml clean package -DskipTests

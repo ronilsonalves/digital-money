@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: eureka
-          image: reneralmeida/service-discovery:latest
+          image: registry.gitlab.com/reneralmeida/pi-ii/service-discovery
           ports:
             - name: http
               containerPort: 8761
@@ -30,4 +30,4 @@ spec:
             periodSeconds: 1
           imagePullPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: gitlabcred
