@@ -7,6 +7,7 @@ import com.digitalhouse.money.accountservice.exceptionhandler.ResourceNotFoundEx
 import com.digitalhouse.money.accountservice.exceptionhandler.UnauthorizedException;
 import com.digitalhouse.money.accountservice.response.PageResponse;
 import com.digitalhouse.money.accountservice.service.TransactionService;
+import com.lowagie.text.DocumentException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,7 @@ public class TransferController {
     @PostMapping("/accounts/{accountId}/transfers")
     @ResponseStatus(HttpStatus.CREATED)
     public TransferResponseDTO sendTransfer(@PathVariable UUID accountId, @RequestBody TransferRequestDTO request) throws
-            UnauthorizedException, ResourceNotFoundException, InsufficientFundsException {
+            UnauthorizedException, ResourceNotFoundException, InsufficientFundsException, DocumentException {
         return service.save(request, accountId);
     }
 
