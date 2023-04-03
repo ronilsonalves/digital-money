@@ -1,0 +1,93 @@
+acc_svc_build_stage:
+    rules:
+    - if: $CI_COMMIT_REF_NAME != "aws-env"
+      when: never
+    - changes:
+      - account-service/**/*  
+    stage: build
+    image: maven:3-openjdk-17
+    environment:
+      name: aws_cicd_account_service
+    script:
+      - cd account-service
+      - echo "Building app..."
+      - mvn clean install -DskipTests
+      - echo "Finished building the app." 
+    artifacts:
+      expire_in: 1 day
+      paths:
+          - account-service/target/account-service-0.0.1-SNAPSHOT.jar
+          
+acc_svc_deploy_stage:
+    rules:
+    - if: $CI_COMMIT_REF_NAME != "aws-env"
+      when: never
+    - changes:
+      - account-service/**/*      
+    stage: deploy
+    image: alpine:latest
+    environment:
+      name: aws_cicd_account_service
+    before_script:
+        - apk update && apk add openssh-client bash
+        - mkdir -p ~/.ssh
+        - eval $(ssh-agent -s)
+        - echo "$AWS_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        - touch ~/.ssh/config
+        - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+        - ssh-keyscan -H $AWS_DEPLOY_SERVER_IP >> ~/.ssh/known_hosts
+    script:
+        - echo "Deploying started..."
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./accounts_service.sh stop"
+        - scp ./account-service/target/account-service-0.0.1-SNAPSHOT.jar ubuntu@$AWS_DEPLOY_SERVER_IP:~/pi/account-service/target
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./accounts_service.sh start"
+        - echo "Finished deploying the app."
+    dependencies:
+        - acc_svc_build_stage 
+        
+usr_svc_build_stage:
+    rules:
+    - if: $CI_COMMIT_REF_NAME != "aws-env"
+      when: never
+    - changes:
+      - users-service/**/*  
+    stage: build
+    image: maven:3-openjdk-17
+    environment:
+      name: aws_cicd_users_service
+    script:
+      - cd users-service
+      - echo "Building app..."
+      - mvn clean install -DskipTests
+      - echo "Finished building the app." 
+    artifacts:
+      expire_in: 1 day
+      paths:
+          - users-service/target/users-service-0.0.1-SNAPSHOT.jar
+          
+usr_svc_deploy_stage:
+    rules:
+    - if: $CI_COMMIT_REF_NAME != "aws-env"
+      when: never
+    - changes:
+      - users-service/**/*      
+    stage: deploy
+    image: alpine:latest
+    environment:
+      name: aws_cicd_users_service
+    before_script:
+        - apk update && apk add openssh-client bash
+        - mkdir -p ~/.ssh
+        - eval $(ssh-agent -s)
+        - echo "$AWS_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        - touch ~/.ssh/config
+        - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+        - ssh-keyscan -H $AWS_DEPLOY_SERVER_IP >> ~/.ssh/known_hosts
+    script:
+        - echo "Deploying started..."
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./users_service.sh stop"
+        - scp ./users-service/target/users-service-0.0.1-SNAPSHOT.jar ubuntu@$AWS_DEPLOY_SERVER_IP:~/pi/users-service/target
+        - ssh ubuntu@$AWS_DEPLOY_SERVER_IP "sudo ~/apps/./users_service.sh start"
+        - echo "Finished deploying the app."
+    dependencies:
+        - usr_svc_build_stage 
