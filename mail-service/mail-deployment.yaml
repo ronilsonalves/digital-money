@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind:
+  Deployment
+metadata:
+  name: mail-service
+  namespace: default
+  labels:
+    app: mail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mail
+  template:
+    metadata:
+      labels:
+        app: mail
+    spec:
+      containers:
+        - name: mail
+          image: registry.gitlab.com/reneralmeida/pi-ii/mail-service
+          ports:
+            - name: http
+              containerPort: 8090
+          env:
+            - name: GIN_MODE
+              value: release
+            - name: HOST
+              value: localhost
+            - name: PORT
+              value: "8090"
+            - name: EUREKA_SERVER_URL
+              value: http://service-discovery:8761/eureka
+            - name: RABBIT_MQ_URL_CONN
+              value: amqps://rzchwbxv:O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD@jackal.rmq.cloudamqp.com/rzchwbxv
+            - name: REALM_CONFIG_URL
+              value: http://auth.pi.ronilsonalves.com/realms/digitalmoney
+            - name: CLIENT_ID
+              value: backend
+            - name: CLIENT_SECRET
+              value: A3OQ2NR9S85xMVMQ88t2CfEciVbXb2ol
+            - name: SMTP_HOST
+              value: sandbox.smtp.mailtrap.io
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_USERNAME
+              value: 5c7bc7506a2695
+            - name: SMTP_PASSWORD
+              value: 66b794e42718b3
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: gitlabcred
