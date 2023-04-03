@@ -2,7 +2,7 @@
   "id": "6bbf3130-cbef-4fa0-8597-12d5dc09ebc9",
   "realm": "digitalmoney",
   "displayName": "Digital Money",
-  "displayNameHtml": "","user": "api"
+  "displayNameHtml": "",
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
