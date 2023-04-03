@@ -2,7 +2,7 @@
   "id": "6bbf3130-cbef-4fa0-8597-12d5dc09ebc9",
   "realm": "digitalmoney",
   "displayName": "Digital Money",
-  "displayNameHtml": "",
+  "displayNameHtml": "","user": "api"
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
@@ -1603,13 +1603,13 @@
     "auth": "true",
     "envelopeFrom": "",
     "ssl": "false",
-    "password": "**********",
+    "password": "66b794e42718b3",
     "port": "587",
     "replyTo": "",
-    "host": "live.smtp.mailtrap.io",
-    "from": "dev@dev.perseidas.dev",
+    "host": "sandbox.smtp.mailtrap.io",
+    "from": "auth@digitalmoney.com",
     "fromDisplayName": "Digital Money",
-    "user": "api"
+    "user": "5c7bc7506a2695"
   },
   "loginTheme": "",
   "accountTheme": "",
