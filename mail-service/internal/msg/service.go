@@ -23,6 +23,6 @@ func SendMsg(msg domain.MsgRequest) {
 		os.Getenv("SMTP_USERNAME"),
 		os.Getenv("SMTP_PASSWORD"))
 	if err := d.DialAndSend(m); err != nil {
-		log.Fatalf("Error while trying to send msg: %s", err)
+		log.Printf("Error while trying to send msg: %s\n", err)
 	}
 }
