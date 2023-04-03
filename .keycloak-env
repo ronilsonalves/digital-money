@@ -1,0 +1,15 @@
+KC_HEALTH_ENABLED=true
+KC_METRICS_ENABLED=true
+KC_TRANSACTION_XA_ENABLED=true
+KC_HOSTNAME=auth.pi.ronilsonalves.com
+KC_HTTPS_CERTIFICATE_FILE=/etc/x509/https/cert.pem
+KC_HTTPS_CERTIFICATE_KEY_FILE=/etc/x509/https/privkey.pem
+KC_HOSTNAME_STRICT_HTTPS=true
+KC_PROXY=edge
+KEYCLOAK_ADMIN=admin
+KEYCLOAK_ADMIN_PASSWORD=S373Y91YQuf
+KC_DB=postgres
+KC_DB_PASSWORD=Y1JA779wa9UEHdQ9
+KC_DB_USERNAME=postgres
+KC_DB_URL=jdbc:postgresql://dbkeycloak.pi.ronilsonalves.com:5432/keycloak
+PROXY_ADDRESS_FORWARDING=true

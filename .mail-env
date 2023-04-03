@@ -1,0 +1,16 @@
+GIN_MODE=release
+HOST=localhost
+PORT=8090
+#EurekaServiceDiscovery
+EUREKA_SERVER_URL=http://service-discovery:8761/eureka
+#RABBIT_MQ
+RABBIT_MQ_URL_CONN=amqps://rzchwbxv:O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD@jackal.rmq.cloudamqp.com/rzchwbxv
+#OAUTH2_KEYCLOAK
+REALM_CONFIG_URL=http://auth.pi.ronilsonalves.com/realms/digitalmoney
+CLIENT_ID=backend
+CLIENT_SECRET=A3OQ2NR9S85xMVMQ88t2CfEciVbXb2ol
+#SMTP_CREDENTIALS
+SMTP_HOST=sandbox.smtp.mailtrap.io
+SMTP_PORT=587
+SMTP_USERNAME=5c7bc7506a2695
+SMTP_PASSWORD=66b794e42718b3

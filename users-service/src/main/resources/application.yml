@@ -60,8 +60,10 @@ eureka:
   instance:
     hostname: localhost
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://service-discovery:8761/eureka/
 
 springdoc:
   packages-to-scan: com.digitalhouse.money.usersservice.api.controller
