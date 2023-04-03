@@ -1,24 +1,26 @@
 version: '3.9'
 services:
 
-# Nosso projeto tem a imagem do Keycloak configurada com certificado SSL válido no AKS da Azure graças ao estimado colega Ronilson.
+# Para conseguir fazer o pull das imagens foi gerado um deploy token (read-only) com data de expiração (3 de maio):
+# docker login registry.gitlab.com
+# username: t2g2-backend
+# password: GewFPSFPPwUQTkfBy-Zz
+
+# Nosso projeto teve o Keyloak hospedado na Azure (graças ao estimado colega Ronilson) da Sprint II até metade da Sprint IV,
+# onde a transferimos para a AWS em nosso ambiente Kubernetes.
 #  keycloak:
 #    container_name: keycloak
-#    image: quay.io/keycloak/keycloak:20.0.2-1
+#    image: registry.gitlab.com/reneralmeida/pi-ii/keycloak
 #    volumes:
 #      - ./keycloak/import:/opt/keycloak/data/import
+#      - ./keycloak/certs/:/etc/x509/https
+#    restart: unless-stopped
+#    env_file:
+#      - .keycloak-env
 #    ports:
 #      - '8070:8080'
-#    command: "start-dev --import-realm"
-#    environment:
-#      DB_VENDOR: postgres
-#      DB_ADDR: ${KEYCLOAK_DB_URL}
-#      DB_PORT: ${KEYCLOAK_DB_PORT}
-#      DB_DATABASE: keycloak
-#      DB_USER: ${KEYCLOAK_DB_USER}
-#      DB_PASSWORD: ${KEYCLOAK_DB_PASS}
-#      KEYCLOAK_ADMIN: admin
-#      KEYCLOAK_ADMIN_PASSWORD: 'S373Y91YQuf'
+#      - '8443:8443'
+#    command: "-v start --https-protocols=TLSv1.3,TLSv1.2 --import-realm"
 #    extra_hosts:
 #      - "host.docker.internal:host-gateway"
 #    networks:
