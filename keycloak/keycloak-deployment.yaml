@@ -1,28 +1,9 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: keycloak
-  namespace: development
-  labels:
-    app: keycloak
-spec:
-  ports:
-    - name: http
-      port: 80
-      targetPort: 8080
-    - name: https
-      port: 443
-      targetPort: 8443
-  selector:
-    app: keycloak
-  type: LoadBalancer
----
 apiVersion: apps/v1
 kind:
   Deployment
 metadata:
   name: keycloak
-  namespace: development
+  namespace: default
   labels:
     app: keycloak
 spec:
@@ -37,11 +18,11 @@ spec:
     spec:
       containers:
         - name: keycloak
-          image: digitalmoneydev.azurecr.io/keycloak:ssl
+          image: registry.gitlab.com/reneralmeida/pi-ii/keycloak
           volumeMounts:
-          - name: tls-keycloak
-            mountPath: "/etc/ssl"
-            readOnly: true
+            - name: tls-keycloak
+              mountPath: "/etc/ssl"
+              readOnly: true
           ports:
             - name: http
               containerPort: 8080
@@ -79,6 +60,8 @@ spec:
               value: postgres
             - name: KC_DB_URL
               value: jdbc:postgresql://dbkeycloak.pi.ronilsonalves.com:5432/keycloak
+            - name: PROXY_ADDRESS_FORWARDING
+              value: "true"
           readinessProbe:
             httpGet:
               path: /admin/master/console/
@@ -92,27 +75,4 @@ spec:
             secretName: tls-keycloak-sec
             optional: false
       imagePullSecrets:
-        - name: acr-secret
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: keycloak-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-spec:
-  tls:
-    - hosts:
-        - auth.pi.ronilsonalves.com
-      secretName: tls-keycloak-sec
-  rules:
-    - host: auth.pi.ronilsonalves.com.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: keycloak
-                port:
-                  name: http
+        - name: gitlabcred

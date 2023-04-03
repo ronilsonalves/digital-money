@@ -2,17 +2,21 @@ package com.digitalhouse.money.accountservice.data.repository;
 
 import com.digitalhouse.money.accountservice.data.dto.ILastFiveTransfers;
 import com.digitalhouse.money.accountservice.data.dto.ITransferResponseDTO;
+import com.digitalhouse.money.accountservice.data.dto.TransactionFilterRequestDTO;
 import com.digitalhouse.money.accountservice.data.enums.TransactionType;
 import com.digitalhouse.money.accountservice.data.model.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
+import static com.digitalhouse.money.accountservice.specs.TransactionFilterSpecification.getFilterSpecification;
+
+public interface TransactionRepository extends JpaRepository<Transaction, UUID>, JpaSpecificationExecutor<Transaction> {
 
     List<Transaction> findAllByOriginAccountNumber(UUID accountId);
 
@@ -20,7 +24,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
             ".transactionDate DESC")
     Page<ITransferResponseDTO> findAllByOriginAccountNumberAndTransactionTypeOrderByTransactionDate(
             UUID origin, TransactionType type, Pageable pageable
-            );
+    );
 
     @Query("SELECT DISTINCT t.recipientAccountNumber AS transactionDestination, MAX(t.transactionDate) AS " +
             "transactionDate FROM Transaction t " +
@@ -28,4 +32,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     List<ILastFiveTransfers> findTop5RecipientAccountNumberAndTransactionDateByOriginAccountNumber(
             UUID originAccountNumber,
             TransactionType transactionType);
+
+    default Page<Transaction> findByAccountIdAndFilter(UUID accountId, TransactionFilterRequestDTO filter, Pageable pageable) {
+        return findAll(getFilterSpecification(accountId, filter), pageable);
+    }
+
 }

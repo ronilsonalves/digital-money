@@ -5,8 +5,16 @@ import com.digitalhouse.money.accountservice.data.dto.UserResponse;
 import com.digitalhouse.money.accountservice.data.model.Account;
 import com.digitalhouse.money.accountservice.data.model.Transaction;
 import com.digitalhouse.money.accountservice.data.repository.IUserFeignRepository;
+import com.digitalhouse.money.accountservice.service.PdfGenUploadService;
+import com.lowagie.text.DocumentException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 @AllArgsConstructor
@@ -14,59 +22,80 @@ public class MailConstructor {
 
     private final IUserFeignRepository userFeignRepository;
 
-    public MailMessageDTO getMailMessageAddCard(Account account, String cardEnding ) {
+    private final PdfGenUploadService pdfService;
+
+    private final SpringTemplateEngine templateEngine;
+
+    public MailMessageDTO getMailMessageAddCard(Account account, String cardEnding, UUID cardId, String cardOwner) {
         UserResponse user = userFeignRepository.getUserByUUID(account.getUserId());
+        String body = templateEngine.process("mail/add_card",buildContext(user,null,null,cardEnding,cardId.toString()
+                ,cardOwner));
 
         return MailMessageDTO.builder()
                 .userResponse(user)
                 .subject(user.name()+", você adicionou um novo cartão à sua carteira")
-                .body("<p>Parabéns "+user.name()+", o cartão final <b>"+cardEnding+"</b> foi adicionado com sucesso à" +
-                        " sua carteira e já pode ser utilizá-lo para adicionar saldo à sua conta.</p></br>")
+                .body(body)
                 .build();
     }
 
-    public MailMessageDTO getMailMessageDelCard(Account account, String cardEnding) {
+    public MailMessageDTO getMailMessageDelCard(Account account, String cardEnding, UUID cardId, String cardOwner) {
         UserResponse user = userFeignRepository.getUserByUUID(account.getUserId());
+        String body = templateEngine.process("mail/del_card",buildContext(user,null,null,cardEnding,cardId.toString()
+                ,cardOwner));
 
         return MailMessageDTO.builder()
                 .userResponse(user)
                 .subject("Exclusão de cartão realizada")
-                .body("<p>"+user.name()+", você removeu com sucesso de sua conta o cartão final "+cardEnding+"</p" +
-                        "></br>" +
-                        "<i><b>Lembrete:</b> é necessário ao menos um cartão ativo na conta para adição de " +
-                        "saldo.</i>").build();
+                .body(body)
+                .build();
     }
 
-    public MailMessageDTO getMailMessageAddMoney(Account account, Transaction transaction) {
+    public MailMessageDTO getMailMessageAddMoney(Account account, Transaction transaction, String cardOwner) throws DocumentException {
         UserResponse user = userFeignRepository.getUserByUUID(account.getUserId());
+        Context context = buildContext(user,null,transaction,transaction.getCardEnding(),null,cardOwner);
+        String body = templateEngine.process("mail/add_money",context);
+        pdfService.generatePDFFile("pdf/deposit_receipt",context,account.getId(),transaction.getUuid());
+
         return MailMessageDTO.builder()
                 .userResponse(user)
                 .subject(user.name()+", você adicionou dinheiro à sua conta!")
-                .body("Olá "+user.name()+", você acabou de acionar R$ "+transaction.getTransactionAmount()+" à sua " +
-                        "carteira usando um de seus cartões.<br>" +
-                        "<b>Detalhes da transação:</b></br>" +
-                        "<b>Cartão final:</b> "+transaction.getCardEnding()+"</br>" +
-                        "<b>Valor do depósito:</b> "+transaction.getTransactionAmount()+"</br>" +
-                        "<b>Data do depósito:</b> "+transaction.getTransactionDate()+"</br>" +
-                        "<i>Use já seu saldo para realizar transferências entre contas</i>").build();
+                .body(body).build();
     }
 
     public MailMessageDTO getMailMessageTransferMoney(Account originAccount, Account recipientAccount,
-                                                      Transaction transaction) {
+                                                      Transaction transaction) throws DocumentException {
         UserResponse from = userFeignRepository.getUserByUUID(originAccount.getUserId());
         UserResponse to = userFeignRepository.getUserByUUID(recipientAccount.getUserId());
+        Context context = buildContext(from,to,transaction,null,null,null);
+        String body = templateEngine.process("mail/transfer_money",context);
+        pdfService.generatePDFFile("pdf/transfer_receipt",context,originAccount.getId(),transaction.getUuid());
+
         return MailMessageDTO.builder()
                 .userResponse(from)
-                .subject("Você enviou R$ "+transaction.getTransactionAmount()+" para "+to.name()+" "+to.lastName())
-                .body("<p>Olá "+from.name()+", você enviou R$ "+transaction.getTransactionAmount()+" para a conta de " +
-                        to.name()+".</p></br>" +
-                        "<b>Detalhes da transação:</b></br>" +
-                        "<p>" +
-                        "<b>Nome do titular:</b> "+to.name()+" "+to.lastName()+ "</br>" +
-                        "<b>N° da conta de destino:</b> "+recipientAccount.getId()+"</br>" +
-                        "<b>Valor da transferência:</b> "+transaction.getTransactionAmount()+"</br>" +
-                        "<b>Data da transação:</b> "+transaction.getTransactionAmount()+"</br></p>" +
-                        "<i>Para consultar seu saldo após essa transação basta acessar o app da Digital Money</i>").build();
+                .subject("Comprovante de transferência")
+                .body(body)
+                .build();
     }
 
+    private Context buildContext(UserResponse userResponse, UserResponse recipient, Transaction transaction,
+                                 String cardEnding, String cardId, String cardOwner                                     ) {
+        Context context = new Context();
+        Map<String, Object> model = new HashMap<>();
+        model.put("firstName",userResponse.name());
+        model.put("transactionOwner",userResponse.name()+' '+userResponse.lastName());
+        model.put("transactionNumber",transaction.getUuid());
+        model.put("transactionDate",transaction.getTransactionDate());
+        model.put("transactionOriginAccountNumber",transaction.getOriginAccountNumber());
+        model.put("transactionRecipientAccountNumber",transaction.getRecipientAccountNumber());
+        if (recipient != null)
+            model.put("transactionRecipient",recipient.name()+' '+recipient.lastName());
+        model.put("transactionCardEnding",transaction.getCardEnding());
+        model.put("transactionDescription",transaction.getDescription());
+        model.put("transactionAmount",transaction.getTransactionAmount());
+        model.put("cardEnding",cardEnding);
+        model.put("cardId",cardId);
+        model.put("cardOwner",cardOwner);
+        context.setVariables(model);
+        return context;
+    }
 }

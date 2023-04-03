@@ -37,30 +37,6 @@ spring:
     password: O5muhJ8IqbGG5CUIhYW0lf0vjulcFDaD
     virtual-host: rzchwbxv
 
-#resilience4j:
-#  circuitbreaker:
-#    instances:
-#      userCircuitBreaker:
-#        allowHealthIndicatorToFail: false
-#        registerHealthIndicator: true
-#        slidingWindowType: COUNT_BASED
-#        slidingWindowSize: 5
-#        failure-rate-threshold: 50
-#        waitDurationInOpenState: 50s
-#        permitted-number-of-calls-in-half-open-state: 3
-#        automatic-transition-from-open-to-half-open-enabled: true
-#  retry:
-#    instances:
-#      userCircuitBreaker:
-#        maxAttempts: 3
-#        waitDuration: 10s
-#
-#        retryExceptions:
-#          - feign.FeignException.InternalServerError
-#          - org.springframework.web.client.HttpServerErrorException
-#          - java.util.concurrent.TimeoutException
-#          - java.io.IOException
-
 server:
   port: 8082
 
@@ -78,6 +54,16 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+#Comentar acima e descomentar se for buildar Dockerfile
+#eureka:
+#  instance:
+#    hostname: localhost
+#  client:
+#    registerWithEureka: true
+#    fetchRegistry: true
+#    serviceUrl:
+#      defaultZone: http://service-discovery:8761/eureka/
 
 digitalmoney:
   keycloak:
@@ -98,3 +84,9 @@ springdoc:
     oauth:
       client-id: ${CLIENT_ID_BACKEND}
       client-secret: ${CLIENT_SECRET_BACKEND}
+
+aws:
+  s3:
+    access-key-id: ${S3_ACCESS_KEY_ID}
+    secret-access-key: ${S3_SECRET_ACCESS_KEY}
+    region: "sa-east-1"
