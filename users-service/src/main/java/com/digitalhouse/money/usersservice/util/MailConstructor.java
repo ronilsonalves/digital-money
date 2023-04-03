@@ -47,7 +47,7 @@ public class MailConstructor {
     }
 
     public MailMessageDTO getEmailMessageEmailVerified(UserResponse user) {
-        String body = templateEngine.process("mail/resend_code",buildContext(user, null));
+        String body = templateEngine.process("mail/email_activated",buildContext(user, null));
 
         return MailMessageDTO.builder()
                 .userResponse(user)
