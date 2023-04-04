@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Tag;
 
 public class AccountCreationTest {
 
+    //Teste deprecado após a implementação de validação por e-mail na sprint 3
     @Test
     @Tag("Spring 1")
     public void UsersAccountCreationTest_validInputShouldReturnCode201AndId() {
