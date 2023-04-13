@@ -55,8 +55,9 @@ func Consume() {
 			msgRequest := domain.MsgRequest{}
 			err := json.Unmarshal(msg.Body, &msgRequest)
 			if err == nil {
-				log.Println("Sending msg...", msgRequest)
+				log.Println("Sending msg...")
 				m.SendMsg(msgRequest)
+				log.Println("Message sent!")
 			} else {
 				log.Println("error converting msg received: ", err, msgRequest)
 			}
