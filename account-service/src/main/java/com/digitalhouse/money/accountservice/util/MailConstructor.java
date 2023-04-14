@@ -82,16 +82,18 @@ public class MailConstructor {
         Context context = new Context();
         Map<String, Object> model = new HashMap<>();
         model.put("firstName",userResponse.name());
-        model.put("transactionOwner",userResponse.name()+' '+userResponse.lastName());
-        model.put("transactionNumber",transaction.getUuid());
-        model.put("transactionDate",transaction.getTransactionDate());
-        model.put("transactionOriginAccountNumber",transaction.getOriginAccountNumber());
-        model.put("transactionRecipientAccountNumber",transaction.getRecipientAccountNumber());
+        if (transaction != null) {
+            model.put("transactionOwner",userResponse.name()+' '+userResponse.lastName());
+            model.put("transactionNumber",transaction.getUuid());
+            model.put("transactionDate",transaction.getTransactionDate());
+            model.put("transactionOriginAccountNumber",transaction.getOriginAccountNumber());
+            model.put("transactionRecipientAccountNumber",transaction.getRecipientAccountNumber());
+            model.put("transactionCardEnding",transaction.getCardEnding());
+            model.put("transactionDescription",transaction.getDescription());
+            model.put("transactionAmount",transaction.getTransactionAmount());
+        }
         if (recipient != null)
             model.put("transactionRecipient",recipient.name()+' '+recipient.lastName());
-        model.put("transactionCardEnding",transaction.getCardEnding());
-        model.put("transactionDescription",transaction.getDescription());
-        model.put("transactionAmount",transaction.getTransactionAmount());
         model.put("cardEnding",cardEnding);
         model.put("cardId",cardId);
         model.put("cardOwner",cardOwner);
