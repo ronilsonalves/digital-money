@@ -121,12 +121,15 @@ public class UserServiceImpl implements UserService {
             UUID accountNumber = fromDb.get().getAccountNumber();
             UserRequestBody toKeycloak = new UserRequestBody();
             //Validating if any field is empty and setting CPF for already present in DB
-            if (user.getName() == null)
-                toKeycloak.setName(fromDb.get().getName());
-            if (user.getLastName() == null)
-                toKeycloak.setLastName(fromDb.get().getLastName());
-            if (user.getEmail() == null)
-                toKeycloak.setEmail(fromDb.get().getEmail());
+            if (user.getName() != null)
+                toKeycloak.setName(user.getName());
+            if (user.getLastName() != null)
+                toKeycloak.setLastName(user.getLastName());
+            if (user.getEmail() != null)
+                toKeycloak.setEmail(user.getEmail());
+            if (user.getPassword() != null)
+                toKeycloak.setPassword(user.getPassword());
+
             User resultFromKeycloak = iUserKeycloak.updateUser(userUUID,toKeycloak);
 
             if (!resultFromKeycloak.getEmail().equals(fromDb.get().getEmail()))
