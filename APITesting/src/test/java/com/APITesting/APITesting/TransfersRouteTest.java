@@ -6,6 +6,9 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 public class TransfersRouteTest {
 
@@ -26,11 +29,14 @@ public class TransfersRouteTest {
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
+        LocalDate currentDate = LocalDate.now(ZoneOffset.UTC);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String currentDateString = formatter.format(currentDate);
         String jsonBody2 = "{"
                 + "\"originAccountNumber\": \"a8ccd122-5159-4435-9430-d81ec53f7089\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
-                + "\"transactionDate\": \"2023-03-24\","
+                + "\"transactionDate\": \"" + currentDateString + "\","
                 + "\"transactionType\": \"TRANSFERÊNCIA\","
                 + "\"description\": \"Segue 100\""
                 + "}";
@@ -39,6 +45,7 @@ public class TransfersRouteTest {
         Assert.assertEquals(statusCode, 201);
         System.out.println("Response body: " + response.body().asString());
     }
+
 
     //Falhando, em vias de correção.
     @Test
@@ -62,7 +69,7 @@ public class TransfersRouteTest {
                 + "\"originAccountNumber\": \"b8ccd122-5159-4435-9430-d81ec53f7086\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
-                + "\"transactionDate\": \"2023-03-21\","
+                + "\"transactionDate\": \"2023-04-03\","
                 + "\"transactionType\": \"TRANSFERÊNCIA\","
                 + "\"description\": \"Segue 100\""
                 + "}";

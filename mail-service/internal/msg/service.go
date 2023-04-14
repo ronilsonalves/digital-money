@@ -13,7 +13,7 @@ type Service interface {
 
 func SendMsg(msg domain.MsgRequest) {
 	m := mail.NewMessage()
-	m.SetHeader("From", "notify@digitalmoney.com")
+	m.SetAddressHeader("From", "digitalmoney@publicapis.ml", "Digital Money")
 	m.SetHeader("To", msg.User.Email)
 	m.SetHeader("Subject", msg.Subject)
 	m.SetBody("text/html", msg.Body)

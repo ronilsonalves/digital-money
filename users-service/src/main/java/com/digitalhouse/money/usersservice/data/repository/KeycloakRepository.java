@@ -117,8 +117,12 @@ public class KeycloakRepository implements IUserKeycloakRepository {
                 passwordCred.setValue(user.getPassword().trim());
                 representation.setCredentials(Collections.singletonList(passwordCred));
             }
-            representation.setFirstName(user.getName());
-            representation.setLastName(user.getLastName());
+            if (user.getName() != null){
+                representation.setFirstName(user.getName());
+            }
+            if (user.getLastName() != null) {
+                representation.setLastName(user.getLastName());
+            }
             if (user.getEmail() != null) {
                 representation.setEmail(user.getEmail());
                 representation.setEnabled(false);
