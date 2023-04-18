@@ -17,8 +17,8 @@ public class LoginTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
-                + "\"password\": \"password123\""
+                + "\"email\": \"falecom@ronilsonalves.com\","
+                + "\"password\": \"12345678\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
         int statusCode = response.getStatusCode();
@@ -51,7 +51,7 @@ public class LoginTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password1234\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");

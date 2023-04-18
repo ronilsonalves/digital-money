@@ -17,7 +17,7 @@ public class PasswordResetTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"emailAddress\": \"johndoe@gmail.com\""
+                + "\"emailAddress\": \"johnmc@gmail.com\""
                 + "}";
         Response response = request.body(jsonBody).post("/users/reset-password");
         int statusCode = response.getStatusCode();
@@ -28,7 +28,7 @@ public class PasswordResetTest {
     @Test
     @Tag("Spring 1")
     public void PasswordResetTest_invalidEmailShouldReturnCode404AndProperMessage() {
-        RestAssured.baseURI = "http://localhost:8081";
+        RestAssured.baseURI = "http://18.231.109.51:8081";
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"

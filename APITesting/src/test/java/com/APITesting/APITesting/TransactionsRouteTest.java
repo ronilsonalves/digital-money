@@ -20,13 +20,13 @@ public class TransactionsRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
         String bearerToken = response.getBody().jsonPath().getString("token");
         String accessToken = bearerToken.replace("Bearer ", "");
-        String account_id = "a8ccd122-5159-4435-9430-d81ec53f7089";
+        String account_id = "b0f82bff-5f5a-422d-84bd-65f94ea6ba53";
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
@@ -34,8 +34,8 @@ public class TransactionsRouteTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String currentDateString = formatter.format(currentDate);
         String jsonBody2 = "{"
-                + "\"originAccountNumber\": \"a8ccd122-5159-4435-9430-d81ec53f7089\","
-                + "\"cardIdentification\": \"906433a8-b382-4978-b434-e17caf51da69\","
+                + "\"originAccountNumber\": \"b0f82bff-5f5a-422d-84bd-65f94ea6ba53\","
+                + "\"cardIdentification\": \"97cc2c95-1a46-431e-8f50-ae7fc8d17a0d\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 1000,"
                 + "\"transactionDate\": \"" + currentDateString + "\","
@@ -55,7 +55,7 @@ public class TransactionsRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
@@ -80,7 +80,6 @@ public class TransactionsRouteTest {
         System.out.println("Response body: " + response.body().asString());
     }
 
-    //Falhando, em vias de correção.
     @Test
     @Tag("Sprint 2")
     public void InvalidDate_shouldReturnCode404AndProperMessage() {
@@ -88,18 +87,18 @@ public class TransactionsRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
         String bearerToken = response.getBody().jsonPath().getString("token");
         String accessToken = bearerToken.replace("Bearer ", "");
-        String account_id = "a8ccd122-5159-4435-9430-d81ec53f7089";
+        String account_id = "b0f82bff-5f5a-422d-84bd-65f94ea6ba53";
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
         String jsonBody2 = "{"
-                + "\"originAccountNumber\": \"a8ccd122-5159-4435-9430-d81ec53f7089\","
+                + "\"originAccountNumber\": \"b0f82bff-5f5a-422d-84bd-65f94ea6ba53\","
                 + "\"cardIdentification\": \"eec716a2-9a1c-4603-8e44-3dd907990721\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
@@ -109,7 +108,7 @@ public class TransactionsRouteTest {
                 + "}";
         response = request2.body(jsonBody2).post("/api/accounts/" + account_id + "/transactions");
         int statusCode = response.getStatusCode();
-        Assert.assertEquals(statusCode, 201);
+        Assert.assertEquals(statusCode, 404);
         System.out.println("Response body: " + response.body().asString());
     }
 
@@ -120,7 +119,7 @@ public class TransactionsRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
@@ -131,11 +130,11 @@ public class TransactionsRouteTest {
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
         String jsonBody2 = "{"
-                + "\"originAccountNumber\": \"a8ccd122-5159-4435-9430-d81ec53f7089\","
+                + "\"originAccountNumber\": \"b0f82bff-5f5a-422d-84bd-65f94ea6ba53\","
                 + "\"cardIdentification\": \"eec716a2-9a1c-4603-8e44-3dd907990721\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 100,"
-                + "\"transactionDate\": \"2023-03-21\","
+                + "\"transactionDate\": \"2023-04-18\","
                 + "\"transactionType\": \"DEPÓSITO\","
                 + "\"description\": \"Segue 100\""
                 + "}";

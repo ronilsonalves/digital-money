@@ -39,7 +39,7 @@ public class UsersDataVisualizationTest {
         RequestSpecification request = given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
@@ -60,7 +60,7 @@ public class UsersDataVisualizationTest {
         RequestSpecification request = given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");

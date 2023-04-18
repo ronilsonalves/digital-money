@@ -16,21 +16,21 @@ public class CardsCreationRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
         String bearerToken = response.getBody().jsonPath().getString("token");
         String accessToken = bearerToken.replace("Bearer ", "");
-        String account_id = "a8ccd122-5159-4435-9430-d81ec53f7089";
+        String account_id = "b0f82bff-5f5a-422d-84bd-65f94ea6ba53";
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
         String jsonBody2 = "{"
-                + "\"cvc\": \"236\","
-                + "\"first_last_name\": \"Doez\","
-                + "\"expiration_date\": \"2023-10\","
-                + "\"number\": 9214567891234562"
+                + "\"cvc\": \"243\","
+                + "\"first_last_name\": \"Doezzy\","
+                + "\"expiration_date\": \"2023-11\","
+                + "\"number\": 6214567891234566"
                 + "}";
         response = request2.body(jsonBody2).post("/api/accounts/" + account_id + "/cards");
         int statusCode = response.getStatusCode();
@@ -45,7 +45,7 @@ public class CardsCreationRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
@@ -74,13 +74,13 @@ public class CardsCreationRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
         String bearerToken = response.getBody().jsonPath().getString("token");
         String accessToken = bearerToken.replace("Bearer ", "");
-        String account_id = "a8ccd122-5159-4435-9430-d81ec53f7089";
+        String account_id = "b0f82bff-5f5a-422d-84bd-65f94ea6ba53";
         RestAssured.baseURI = "http://18.231.109.51:8082";
         RequestSpecification request2 = RestAssured.given();
         request2.headers("Authorization", "Bearer " + accessToken, "Content-Type", "application/json");
@@ -103,7 +103,7 @@ public class CardsCreationRouteTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");

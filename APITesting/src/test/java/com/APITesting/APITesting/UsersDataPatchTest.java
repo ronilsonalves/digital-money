@@ -11,6 +11,7 @@ import static io.restassured.RestAssured.given;
 
 public class UsersDataPatchTest {
 
+    //Teste deprecado após a implementação de validação por e-mail na sprint 3
     @Test
     @Tag("Sprint 2")
     public void PatchData_shouldReturnCode200AndDetailedUserData() {
@@ -29,7 +30,7 @@ public class UsersDataPatchTest {
         String jsonBody2 = "{"
                 + "\"name\": \"John\","
                 + "\"lastname\": \"Doe\","
-                + "\"email\": \"johndoe@example.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"phone\": \"11987654321\","
                 + "\"password\": \"password123\""
                 + "}";
@@ -46,7 +47,7 @@ public class UsersDataPatchTest {
         RequestSpecification request = given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
@@ -58,7 +59,7 @@ public class UsersDataPatchTest {
                 + "\"name\": \"John\","
                 + "\"lastName\": \"Doe\","
                 + "\"cpf\": \"917.419.234-44\","
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"phone\": \"11987654321\","
                 + "\"password\": \"password123\""
                 + "}";

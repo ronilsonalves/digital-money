@@ -40,7 +40,7 @@ public class AccountDataVisualizationTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");
@@ -64,7 +64,7 @@ public class AccountDataVisualizationTest {
         RequestSpecification request = RestAssured.given();
         request.header("Content-Type", "application/json");
         String jsonBody = "{"
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"password\": \"password123\""
                 + "}";
         Response response = request.body(jsonBody).post("/auth/login");

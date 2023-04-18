@@ -21,7 +21,7 @@ public class AccountCreationTest {
                 + "\"name\": \"John\","
                 + "\"lastName\": \"Doe\","
                 + "\"cpf\": \"617.419.234-22\","
-                + "\"email\": \"johndoe@gmail.com\","
+                + "\"email\": \"johnmc@gmail.com\","
                 + "\"phone\": \"11987654321\","
                 + "\"password\": \"password123\""
                 + "}";
