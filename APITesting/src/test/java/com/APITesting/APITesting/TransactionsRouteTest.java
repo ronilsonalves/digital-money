@@ -35,7 +35,7 @@ public class TransactionsRouteTest {
         String currentDateString = formatter.format(currentDate);
         String jsonBody2 = "{"
                 + "\"originAccountNumber\": \"a8ccd122-5159-4435-9430-d81ec53f7089\","
-                + "\"cardIdentification\": \"eec716a2-9a1c-4603-8e44-3dd907990721\","
+                + "\"cardIdentification\": \"906433a8-b382-4978-b434-e17caf51da69\","
                 + "\"recipientAccountNumber\": \"1d7cc85c-96c8-4cbf-95ff-2a5a3ff30ba7\","
                 + "\"transactionAmount\": 1000,"
                 + "\"transactionDate\": \"" + currentDateString + "\","
