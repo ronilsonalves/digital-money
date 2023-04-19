@@ -40,13 +40,13 @@ spec:
             - name: CLIENT_SECRET
               value: A3OQ2NR9S85xMVMQ88t2CfEciVbXb2ol
             - name: SMTP_HOST
-              value: sandbox.smtp.mailtrap.io
+              value: smtp.mailersend.net
             - name: SMTP_PORT
               value: "587"
             - name: SMTP_USERNAME
-              value: 5c7bc7506a2695
+              value: MS_YaEu0s@publicapis.ml
             - name: SMTP_PASSWORD
-              value: 66b794e42718b3
+              value: RKltovI2KZ4kDKFu
           imagePullPolicy: Always
       imagePullSecrets:
         - name: gitlabcred
