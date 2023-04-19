@@ -41,7 +41,7 @@ public class OAuth2ResourceServerSecurityConfig {
                                 .jwtAuthenticationConverter(new KeycloakJwtAuthConverter());
                                 authorize
                                         .anyRequest().authenticated()
-                                        .and().cors().disable().csrf().disable();
+                                        .and().cors().and().csrf().disable();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

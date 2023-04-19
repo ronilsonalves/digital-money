@@ -21,7 +21,7 @@ public class CardRequestDTO {
     @NotBlank(message = "Name is required")
     private String first_last_name;
 
-    @Pattern(regexp = "\\d{4}-\\d{2}", message = "Expiration date must be in the format yyyy-MM")
+    @Pattern(regexp = "\\d{2}/\\d{2}", message = "Expiration date must be in the format MM/yy")
     private String expiration_date;
 
     @NotNull(message = "Card number is required")

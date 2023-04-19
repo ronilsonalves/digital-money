@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -64,6 +65,20 @@ public class UserController {
             ServerException,
             UnauthorizedException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByUUID(userUUID));
+    }
+
+    @GetMapping("/me")
+    @SecurityRequirement(name = "BearerAuth")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> getLoggedUser() throws ResourceNotFoundException,
+            ServerException,
+            UnauthorizedException {
+        UUID fromAuthContext = UUID.fromString(
+                SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getName()
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserByUUID(fromAuthContext));
     }
 
     @PostMapping("/send-verification")

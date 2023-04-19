@@ -53,7 +53,7 @@ public class CardServiceImpl implements CardService {
         }
 
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/yy");
             YearMonth expirationDate = YearMonth.parse(dto.getExpiration_date(), formatter);
             if (expirationDate.isBefore(YearMonth.now())) {
                 throw new ConflictException("Date invalid");

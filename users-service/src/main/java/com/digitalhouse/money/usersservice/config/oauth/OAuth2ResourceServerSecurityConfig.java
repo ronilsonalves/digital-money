@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.web.SecurityFilterChain;
 
+
 @Configuration
 @EnableMethodSecurity
 public class OAuth2ResourceServerSecurityConfig {
@@ -37,7 +38,7 @@ public class OAuth2ResourceServerSecurityConfig {
                                 .jwtAuthenticationConverter(new KeycloakJwtAuthConverter());
                         authorize
                                 .anyRequest().authenticated()
-                                .and().cors().disable().csrf().disable();
+                                .and().cors().and().csrf().disable();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -50,4 +51,5 @@ public class OAuth2ResourceServerSecurityConfig {
     public JwtDecoder jwtDecoder() {
         return JwtDecoders.fromIssuerLocation("https://auth.pi.ronilsonalves.com/realms/digitalmoney");
     }
+
 }
